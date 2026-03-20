@@ -126,8 +126,8 @@ export default function Dashboard() {
   return (
     <div style={{ padding: '24px' }}>
       <div style={{ marginBottom: 24 }}>
-        <Title level={2} style={{ margin: 0 }}>Dashboard</Title>
-        <Text type="secondary">肯葳科技电商视频发布平台概览</Text>
+        <Title level={2} style={{ margin: 0 }}>控制台</Title>
+        <Text type="secondary">AIGC 电商视频发布平台 · 总览</Text>
       </div>
 
       {/* Workflow Illustration */}
@@ -136,16 +136,16 @@ export default function Dashboard() {
         style={{ marginBottom: 24 }}
         extra={<Text type="secondary">点击任意步骤跳转</Text>}
       >
-        <Row gutter={[8, 16]} align="middle" justify="center">
+        <Row gutter={[12, 12]} align="middle" justify="start" wrap>
           {WORKFLOW_STEPS.map((step, idx) => (
-            <Col key={step.key} flex="none" style={{ textAlign: 'center' }}>
+            <Col key={step.key} xs={12} sm={8} md={6} lg={4} style={{ textAlign: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Card
                   hoverable
                   size="small"
                   onClick={() => navigate(step.route)}
                   style={{
-                    width: 140,
+                    width: '100%',
                     textAlign: 'center',
                     borderColor: getStepStatus(step) === 'finish' ? '#52c41a' : undefined,
                     background: getStepStatus(step) === 'finish' ? '#f6ffed' : undefined,
@@ -186,7 +186,7 @@ export default function Dashboard() {
         </Row>
       ) : (
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          <Col span={6}>
+          <Col xs={12} sm={12} md={6}>
             <Card>
               <Statistic
                 title="设备总数"
@@ -195,7 +195,7 @@ export default function Dashboard() {
               />
             </Card>
           </Col>
-          <Col span={6}>
+          <Col xs={12} sm={12} md={6}>
             <Card>
               <Statistic
                 title="视频总数"
@@ -204,7 +204,7 @@ export default function Dashboard() {
               />
             </Card>
           </Col>
-          <Col span={6}>
+          <Col xs={12} sm={12} md={6}>
             <Card>
               <Statistic
                 title="今日任务"
@@ -213,7 +213,7 @@ export default function Dashboard() {
               />
             </Card>
           </Col>
-          <Col span={6}>
+          <Col xs={12} sm={12} md={6}>
             <Card>
               <Statistic
                 title="成功率 (7天)"

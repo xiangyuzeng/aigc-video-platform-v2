@@ -261,7 +261,7 @@ export default function Profiles() {
         showIcon
         icon={<InfoCircleOutlined />}
         message="如何使用设备管理"
-        description="设备列表从 AdsPower 同步。先在「设置」页面添加 AdsPower 服务器地址，然后点击「同步设备」拉取所有浏览器环境。每个设备对应一个 AdsPower 浏览器配置文件，可设置发布平台和标签。"
+        description="设备列表从 AdsPower 同步。先在「服务器」页面添加服务器地址，然后点击「同步设备」拉取浏览器环境。同步完成后，前往「视频」上传视频，或直接使用「发布」功能。"
         style={{ marginBottom: 16 }}
         closable
       />
@@ -353,6 +353,7 @@ export default function Profiles() {
           loading={profilesLoading}
           pagination={{ pageSize: 20, showSizeChanger: true, showTotal: (t) => `共 ${t} 条` }}
           size="middle"
+          scroll={{ x: 700 }}
         />
       )}
     </div>

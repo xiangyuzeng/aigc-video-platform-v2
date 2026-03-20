@@ -14,8 +14,9 @@ import {
   Empty,
   Spin,
   message,
+  Alert,
 } from 'antd';
-import { InboxOutlined, DeleteOutlined, PlayCircleOutlined, AudioOutlined } from '@ant-design/icons';
+import { InboxOutlined, DeleteOutlined, PlayCircleOutlined, AudioOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getVideos, uploadVideos, deleteVideo, getVideoThumbnailUrl } from '../api/videos';
 import { transcribeVideo } from '../api/scraper';
@@ -113,6 +114,16 @@ export default function Videos() {
         <PlayCircleOutlined style={{ marginRight: 8 }} />
         视频库
       </Title>
+
+      <Alert
+        type="info"
+        showIcon
+        icon={<InfoCircleOutlined />}
+        message="上传视频文件"
+        description="上传要发布的短视频（MP4）。上传后可在「发布」页面选择视频分配给设备发布。"
+        closable
+        style={{ marginBottom: 16 }}
+      />
 
       {/* Upload zone */}
       <Upload.Dragger

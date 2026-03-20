@@ -6,6 +6,8 @@ export interface OverviewStats {
   total_scraped: number;
   total_tasks: number;
   total_published: number;
+  total_queued: number;
+  total_in_progress: number;
   tasks_today: number;
   success_rate: number;
 }

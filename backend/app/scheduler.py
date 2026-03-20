@@ -16,9 +16,16 @@ async def check_scheduled_tasks():
     """Poll for tasks where scheduled_at <= now and status='queued', then execute."""
     async with AsyncSessionLocal() as db:
         now = datetime.utcnow()
+        from sqlalchemy import or_
         stmt = (
             select(Task)
-            .where(Task.status == "queued", Task.scheduled_at <= now, Task.scheduled_at.isnot(None))
+            .where(
+                Task.status == "queued",
+                or_(
+                    Task.scheduled_at.is_(None),        # immediate tasks
+                    Task.scheduled_at <= now,            # scheduled tasks whose time has come
+                ),
+            )
             .options(selectinload(Task.profile).selectinload(Profile.server))
             .options(selectinload(Task.video))
         )

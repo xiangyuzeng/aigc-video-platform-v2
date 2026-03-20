@@ -1,5 +1,14 @@
+import os
+from pathlib import Path
+
 from pydantic_settings import BaseSettings
 from typing import List
+
+# Load .env explicitly so it wins over empty shell env vars
+from dotenv import load_dotenv
+
+_env_path = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(_env_path, override=True)
 
 
 class Settings(BaseSettings):

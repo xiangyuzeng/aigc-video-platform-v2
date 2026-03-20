@@ -325,6 +325,7 @@ export default function Scraper() {
             rowExpandable: () => true,
           }}
           size="middle"
+          scroll={{ x: 600 }}
         />
       </Card>
     </div>

@@ -16,6 +16,7 @@ import {
   message,
   Tabs,
   Tooltip,
+  Alert,
 } from 'antd';
 import {
   PlusOutlined,
@@ -24,6 +25,7 @@ import {
   CopyOutlined,
   FileTextOutlined,
   EyeOutlined,
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -195,6 +197,16 @@ export default function Templates() {
           新建模板
         </Button>
       </div>
+
+      <Alert
+        type="info"
+        showIcon
+        icon={<InfoCircleOutlined />}
+        message="模板库"
+        description="保存常用的发布配置为模板，下次发布时可快速加载。"
+        closable
+        style={{ marginBottom: 16 }}
+      />
 
       {/* Category filter tabs */}
       {categories.length > 0 && (

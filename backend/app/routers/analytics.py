@@ -42,6 +42,18 @@ async def get_overview(db: AsyncSession = Depends(get_db)):
     )
     total_published = published_result.scalar() or 0
 
+    # total_queued
+    queued_result = await db.execute(
+        select(func.count()).select_from(Task).where(Task.status == "queued")
+    )
+    total_queued = queued_result.scalar() or 0
+
+    # total_in_progress
+    in_progress_result = await db.execute(
+        select(func.count()).select_from(Task).where(Task.status.in_(["uploading", "publishing"]))
+    )
+    total_in_progress = in_progress_result.scalar() or 0
+
     # success_rate over last 7 days
     seven_days_ago = datetime.utcnow() - timedelta(days=7)
     rate_result = await db.execute(
@@ -64,6 +76,8 @@ async def get_overview(db: AsyncSession = Depends(get_db)):
         "total_scraped": total_scraped,
         "total_tasks": total_tasks,
         "total_published": total_published,
+        "total_queued": total_queued,
+        "total_in_progress": total_in_progress,
         "tasks_today": tasks_today,
         "success_rate": success_rate,
     }

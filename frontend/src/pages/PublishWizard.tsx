@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Steps, Button, Space, Modal, Input, message, Typography } from 'antd';
-import { SaveOutlined, FolderOpenOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Steps, Button, Space, Modal, Input, message, Typography, Alert } from 'antd';
+import { SaveOutlined, FolderOpenOutlined, DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getDrafts, createDraft, deleteDraft } from '../api/drafts';
 import { usePublishStore } from '../stores/publishStore';
@@ -72,8 +72,8 @@ export default function PublishWizard() {
   return (
     <div>
       {/* Header: title + draft actions */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <Title level={4} style={{ margin: 0 }}>批量发布</Title>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
+        <Title level={4} style={{ margin: 0, whiteSpace: 'nowrap' }}>批量发布</Title>
         <Space>
           <Button icon={<SaveOutlined />} onClick={() => setDraftModalOpen(true)}>
             保存草稿
@@ -84,6 +84,16 @@ export default function PublishWizard() {
           <Button danger onClick={handleReset}>重置</Button>
         </Space>
       </div>
+
+      <Alert
+        type="info"
+        showIcon
+        icon={<InfoCircleOutlined />}
+        message="发布向导"
+        description="选择设备 → 分配视频 → 编辑文案标签 → 确认发布。发布后可在「数据分析」查看结果。"
+        closable
+        style={{ marginBottom: 16 }}
+      />
 
       {/* Steps indicator */}
       <Steps current={step} items={stepItems} style={{ marginBottom: 24 }} />

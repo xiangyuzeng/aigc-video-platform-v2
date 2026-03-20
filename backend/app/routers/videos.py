@@ -292,9 +292,23 @@ async def get_thumbnail(video_id: int, db: AsyncSession = Depends(get_db)):
     video = (await db.execute(select(Video).where(Video.id == video_id))).scalar_one_or_none()
     if not video:
         raise HTTPException(status_code=404, detail="Video not found")
-    if not video.cover_path or not os.path.exists(video.cover_path):
-        raise HTTPException(status_code=404, detail="Thumbnail not available")
-    return FileResponse(video.cover_path, media_type="image/jpeg")
+
+    # If thumbnail exists, serve it
+    if video.cover_path and os.path.exists(video.cover_path):
+        return FileResponse(video.cover_path, media_type="image/jpeg")
+
+    # Try to generate thumbnail on-the-fly from the video file
+    if video.file_path and os.path.exists(video.file_path):
+        os.makedirs(settings.upload_dir, exist_ok=True)
+        cover_name = f"{uuid4()}_cover.jpg"
+        cover_dest = os.path.abspath(os.path.join(settings.upload_dir, cover_name))
+        cover_path = await _generate_thumbnail(video.file_path, cover_dest)
+        if cover_path:
+            video.cover_path = cover_path
+            await db.commit()
+            return FileResponse(cover_path, media_type="image/jpeg")
+
+    raise HTTPException(status_code=404, detail="Thumbnail not available")
 
 
 # --------------------------------------------------------------------------- #

@@ -15,8 +15,8 @@ import {
   Card,
   Image,
   Popconfirm,
-  Spin,
   Descriptions,
+  Alert,
 } from 'antd';
 import {
   PlusOutlined,
@@ -25,6 +25,7 @@ import {
   DeleteOutlined,
   LinkOutlined,
   ShoppingOutlined,
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -246,6 +247,16 @@ export default function Products() {
         <ShoppingOutlined style={{ marginRight: 8 }} />
         商品管理
       </Title>
+
+      <Alert
+        type="info"
+        showIcon
+        icon={<InfoCircleOutlined />}
+        message="商品管理"
+        description="采集和管理商品信息。添加商品后可在「文案生成」中基于商品生成发布内容。"
+        closable
+        style={{ marginBottom: 16 }}
+      />
 
       {/* URL Scrape bar */}
       <Card size="small" style={{ marginBottom: 16 }}>

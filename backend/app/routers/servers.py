@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -103,15 +104,31 @@ async def sync_profiles(server_id: int, db: AsyncSession = Depends(get_db)):
     count = 0
     now = datetime.utcnow()
 
-    for group in groups:
+    # Also fetch all profiles without group filter to catch ungrouped ("未分组") profiles
+    seen_uids: set[str] = set()
+
+    for i, group in enumerate(groups + [{"group_id": "", "group_name": ""}]):
+        if i > 0:
+            await asyncio.sleep(1.5)  # avoid AdsPower rate limit
         gid = str(group.get("group_id", ""))
         gname = group.get("group_name", "").strip()
 
-        profiles = await ads.fetch_profiles(group_id=gid)
+        try:
+            profiles = await ads.fetch_profiles(group_id=gid if gid else None)
+        except Exception:
+            await asyncio.sleep(2)
+            profiles = await ads.fetch_profiles(group_id=gid if gid else None)
         for p in profiles:
             uid = str(p.get("user_id") or p.get("profile_id") or "")
             if not uid or uid == "None":
                 continue
+            if uid in seen_uids:
+                continue
+            seen_uids.add(uid)
+
+            # Use group info from profile itself if available (more accurate for ungrouped)
+            p_gname = str(p.get("group_name", "") or gname).strip()
+            p_gid = str(p.get("group_id", "") or gid).strip()
 
             # Upsert: check if profile_id + server_id exists
             existing = (
@@ -128,8 +145,8 @@ async def sync_profiles(server_id: int, db: AsyncSession = Depends(get_db)):
 
             if existing:
                 existing.profile_name = name
-                existing.group_id = gid
-                existing.group_name = gname
+                existing.group_id = p_gid
+                existing.group_name = p_gname
                 existing.serial_number = serial
                 existing.last_synced_at = now
             else:
@@ -137,8 +154,8 @@ async def sync_profiles(server_id: int, db: AsyncSession = Depends(get_db)):
                     server_id=server_id,
                     profile_id=uid,
                     profile_name=name,
-                    group_id=gid,
-                    group_name=gname,
+                    group_id=p_gid,
+                    group_name=p_gname,
                     serial_number=serial,
                     last_synced_at=now,
                 ))

@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Typography, Table, Button, Modal, Form, Input, Tag, Space, Popconfirm, Alert, message } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, InfoCircleOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getServers, createServer, updateServer, deleteServer } from '../api/servers';
 import type { Server } from '../api/servers';
+import { useNavigate } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
 import EmptyState from '../components/EmptyState';
 
@@ -13,6 +14,7 @@ interface ServerFormValues {
 }
 
 export default function Settings() {
+  const navigate = useNavigate();
   const [editingServer, setEditingServer] = useState<Server | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [form] = Form.useForm<ServerFormValues>();
@@ -130,21 +132,28 @@ export default function Settings() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
         <div>
-          <Typography.Title level={4} style={{ margin: 0 }}>服务器管理</Typography.Title>
+          <Typography.Title level={4} style={{ margin: 0, whiteSpace: 'nowrap' }}>服务器</Typography.Title>
           <Typography.Text type="secondary">管理 AdsPower 服务器连接</Typography.Text>
         </div>
-        <Button type="primary" icon={<PlusOutlined />} onClick={openAddModal}>
-          添加服务器
-        </Button>
+        <Space>
+          <Button type="primary" icon={<PlusOutlined />} onClick={openAddModal}>
+            添加服务器
+          </Button>
+          {servers.length > 0 && (
+            <Button icon={<ArrowRightOutlined />} onClick={() => navigate('/profiles')}>
+              下一步：同步设备
+            </Button>
+          )}
+        </Space>
       </div>
 
       <Alert
         type="info"
         showIcon
         icon={<InfoCircleOutlined />}
-        message="AdsPower 服务器地址在 AdsPower 客户端 → 左侧菜单「API & MCP」页面中查看（如 http://127.0.0.1:50325）"
+        message="第一步：添加 AdsPower 服务器地址。在 AdsPower 客户端 → API & MCP 页面查看（如 http://127.0.0.1:50325）。添加后前往「设备」页面同步浏览器环境。"
         style={{ marginBottom: 16 }}
         closable
       />

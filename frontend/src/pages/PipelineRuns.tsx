@@ -14,6 +14,8 @@ import {
   Tooltip,
   Popconfirm,
   Descriptions,
+  Progress,
+  Alert,
 } from 'antd';
 import {
   PlusOutlined,
@@ -26,6 +28,7 @@ import {
   CloseCircleOutlined,
   LoadingOutlined,
   ClockCircleOutlined,
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -36,7 +39,7 @@ import {
   deletePipelineRun,
   type PipelineRunData,
 } from '../api/pipeline';
-import { listProducts, type ProductData } from '../api/products';
+import { listProducts } from '../api/products';
 import { getProfiles } from '../api/profiles';
 import type { Profile } from '../api/profiles';
 import type { ColumnsType } from 'antd/es/table';
@@ -253,13 +256,25 @@ export default function PipelineRuns() {
       },
     },
     {
-      title: '当前阶段',
-      dataIndex: 'current_stage',
-      key: 'current_stage',
-      width: 120,
-      render: (stage: string) => {
-        const s = PIPELINE_STAGES.find((ps) => ps.key === stage);
-        return s?.title ?? stage;
+      title: '进度',
+      key: 'progress',
+      width: 200,
+      render: (_: unknown, record: PipelineRunData) => {
+        const currentIdx = getStageIndex(record.current_stage);
+        const total = PIPELINE_STAGES.length - 1; // exclude 'completed' pseudo-stage
+        const pct = record.status === 'completed' ? 100 : Math.round((currentIdx / total) * 100);
+        const s = PIPELINE_STAGES.find((ps) => ps.key === record.current_stage);
+        const stageLabel = s?.title ?? record.current_stage;
+        return (
+          <div>
+            <Progress
+              percent={pct}
+              size="small"
+              status={record.status === 'failed' ? 'exception' : record.status === 'completed' ? 'success' : 'active'}
+            />
+            <Text type="secondary" style={{ fontSize: 11 }}>{stageLabel}</Text>
+          </div>
+        );
       },
     },
     {
@@ -401,11 +416,11 @@ export default function PipelineRuns() {
                   >
                     {String(stageObj.status ?? 'pending')}
                   </Tag>
-                  {stageObj.message && (
+                  {stageObj.message ? (
                     <Text type="secondary" style={{ marginLeft: 8 }}>
                       {String(stageObj.message)}
                     </Text>
-                  )}
+                  ) : null}
                 </Descriptions.Item>
               );
             })}
@@ -528,6 +543,16 @@ export default function PipelineRuns() {
         自动流水线
       </Title>
 
+      <Alert
+        type="info"
+        showIcon
+        icon={<InfoCircleOutlined />}
+        message="自动流水线"
+        description="一键完成从内容生成到发布的全流程。选择商品、设备和视频，系统自动生成文案并发布。"
+        closable
+        style={{ marginBottom: 16 }}
+      />
+
       {/* Action bar */}
       <Space style={{ marginBottom: 16 }} wrap>
         <Button
@@ -568,6 +593,7 @@ export default function PipelineRuns() {
         columns={columns}
         dataSource={data?.items ?? []}
         loading={isLoading}
+        scroll={{ x: 900 }}
         pagination={{
           current: page,
           pageSize,
@@ -637,7 +663,7 @@ export default function PipelineRuns() {
           style={{ marginBottom: 16 }}
           items={wizardSteps.map((s) => ({ title: s.title }))}
         />
-        {wizardSteps[wizardStep].content}
+        {wizardSteps[wizardStep]?.content}
       </Modal>
     </div>
   );

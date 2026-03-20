@@ -22,22 +22,43 @@ import type { MenuProps } from 'antd';
 const { Sider } = Layout;
 
 const menuItems: MenuProps['items'] = [
-  { key: '/', icon: <DashboardOutlined />, label: 'Dashboard' },
-  { type: 'divider' },
-  { key: '/settings', icon: <SettingOutlined />, label: '服务器管理' },
-  { key: '/profiles', icon: <LaptopOutlined />, label: '设备' },
-  { key: '/videos', icon: <PlaySquareOutlined />, label: '视频' },
-  { key: '/scraper', icon: <CloudDownloadOutlined />, label: '数据采集' },
-  { key: '/publish', icon: <SendOutlined />, label: '发布' },
-  { key: '/schedule', icon: <CalendarOutlined />, label: '智能排期' },
-  { type: 'divider' },
-  { key: '/products', icon: <ShoppingOutlined />, label: '商品' },
-  { key: '/content', icon: <EditOutlined />, label: '文案生成' },
-  { key: '/pipeline', icon: <ThunderboltOutlined />, label: '自动流水线' },
-  { type: 'divider' },
-  { key: '/analytics', icon: <BarChartOutlined />, label: '数据分析' },
-  { key: '/account-health', icon: <HeartOutlined />, label: '账号健康' },
-  { key: '/templates', icon: <FileTextOutlined />, label: '模板库' },
+  { key: '/', icon: <DashboardOutlined />, label: '控制台' },
+  {
+    type: 'group',
+    label: '基础设置',
+    children: [
+      { key: '/settings', icon: <SettingOutlined />, label: '服务器' },
+      { key: '/profiles', icon: <LaptopOutlined />, label: '设备' },
+    ],
+  },
+  {
+    type: 'group',
+    label: '内容准备',
+    children: [
+      { key: '/videos', icon: <PlaySquareOutlined />, label: '视频' },
+      { key: '/scraper', icon: <CloudDownloadOutlined />, label: '数据采集' },
+      { key: '/products', icon: <ShoppingOutlined />, label: '商品' },
+      { key: '/content', icon: <EditOutlined />, label: '文案生成' },
+    ],
+  },
+  {
+    type: 'group',
+    label: '发布管理',
+    children: [
+      { key: '/publish', icon: <SendOutlined />, label: '发布' },
+      { key: '/schedule', icon: <CalendarOutlined />, label: '智能排期' },
+      { key: '/pipeline', icon: <ThunderboltOutlined />, label: '自动流水线' },
+      { key: '/templates', icon: <FileTextOutlined />, label: '模板库' },
+    ],
+  },
+  {
+    type: 'group',
+    label: '数据监控',
+    children: [
+      { key: '/analytics', icon: <BarChartOutlined />, label: '数据分析' },
+      { key: '/account-health', icon: <HeartOutlined />, label: '账号健康' },
+    ],
+  },
 ];
 
 export default function Sidebar() {
@@ -45,12 +66,18 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const allKeys: string[] = [];
+  menuItems?.forEach((item) => {
+    if (item && 'children' in item && Array.isArray((item as any).children)) {
+      (item as any).children.forEach((child: any) => {
+        if (child?.key) allKeys.push(child.key);
+      });
+    } else if (item && 'key' in item) {
+      allKeys.push(item.key as string);
+    }
+  });
   const selectedKey =
-    menuItems
-      ?.filter((item): item is NonNullable<typeof item> & { key: string } => item !== null)
-      .map((item) => item.key)
-      .filter((key) => key !== '/')
-      .find((key) => location.pathname.startsWith(key)) ?? '/';
+    allKeys.filter((k) => k !== '/').find((k) => location.pathname.startsWith(k)) ?? '/';
 
   const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
     navigate(key);

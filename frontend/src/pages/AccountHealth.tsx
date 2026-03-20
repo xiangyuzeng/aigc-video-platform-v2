@@ -1,5 +1,5 @@
-import { Row, Col, Card, Table, Tag, Progress, Statistic, Button, Typography, Space, Empty, Spin } from 'antd';
-import { DownloadOutlined, AlertOutlined } from '@ant-design/icons';
+import { Row, Col, Card, Table, Tag, Progress, Statistic, Button, Typography, Space, Empty, Spin, Alert } from 'antd';
+import { DownloadOutlined, AlertOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import type { ColumnsType } from 'antd/es/table';
@@ -142,6 +142,16 @@ export default function AccountHealth() {
         </Button>
       </div>
 
+      <Alert
+        type="info"
+        showIcon
+        icon={<InfoCircleOutlined />}
+        message="账号健康监控"
+        description="监控设备的发布成功率和健康分数。分数低的设备可能需要检查或暂停。"
+        closable
+        style={{ marginBottom: 16 }}
+      />
+
       {isLoading ? (
         <Spin size="large" style={{ display: 'block', textAlign: 'center', margin: '48px 0' }} />
       ) : healthData.length === 0 ? (
@@ -149,12 +159,12 @@ export default function AccountHealth() {
       ) : (
         <>
           <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-            <Col span={8}>
+            <Col xs={24} sm={8}>
               <Card>
                 <Statistic title="设备总数" value={totalAccounts} />
               </Card>
             </Col>
-            <Col span={8}>
+            <Col xs={24} sm={8}>
               <Card>
                 <Statistic
                   title="平均健康分数"
@@ -166,7 +176,7 @@ export default function AccountHealth() {
                 />
               </Card>
             </Col>
-            <Col span={8}>
+            <Col xs={24} sm={8}>
               <Card>
                 <Statistic
                   title="有警告的设备"
@@ -185,6 +195,7 @@ export default function AccountHealth() {
               rowKey="profile_id"
               pagination={{ pageSize: 20, showSizeChanger: true, showTotal: (total) => `共 ${total} 条` }}
               size="middle"
+              scroll={{ x: 800 }}
             />
           </Card>
         </>
