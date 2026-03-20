@@ -1,0 +1,18 @@
+[package]
+name = "kenwei-video-platform"
+version = "2.0.0"
+description = "肯葳科技电商视频发布平台"
+authors = ["Kenwei Tech"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

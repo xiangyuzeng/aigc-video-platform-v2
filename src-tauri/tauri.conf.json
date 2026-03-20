@@ -1,0 +1,41 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nickel-org/nickel.rs/master/tauri.conf.schema.json",
+  "productName": "肯葳科技电商视频发布平台",
+  "version": "2.0.0",
+  "identifier": "com.kenwei.video-platform",
+  "build": {
+    "beforeBuildCommand": "npm run build --prefix ../frontend",
+    "beforeDevCommand": "npm run dev --prefix ../frontend",
+    "devUrl": "http://localhost:5173",
+    "frontendDist": "../frontend/dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "肯葳科技电商视频发布平台",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 960,
+        "minHeight": 600,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "externalBin": [
+      "sidecar/backend"
+    ]
+  }
+}
