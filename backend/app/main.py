@@ -115,6 +115,15 @@ app.include_router(pipeline.router, prefix="/api/pipeline", tags=["pipeline"])
 from app.routers import app_settings
 app.include_router(app_settings.router, prefix="/api/app-settings", tags=["app-settings"])
 
+from app.routers import schedule
+app.include_router(schedule.router, prefix="/api/schedule", tags=["schedule"])
+
+from app.routers import templates
+app.include_router(templates.router, prefix="/api/templates", tags=["templates"])
+
+from app.routers import health
+app.include_router(health.router, prefix="/api/health-dashboard", tags=["health"])
+
 
 # --- WebSocket endpoint ---
 from app.ws.manager import ws_manager

@@ -13,6 +13,9 @@ import {
   ShoppingOutlined,
   EditOutlined,
   ThunderboltOutlined,
+  FileTextOutlined,
+  HeartOutlined,
+  CalendarOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 
@@ -26,12 +29,15 @@ const menuItems: MenuProps['items'] = [
   { key: '/videos', icon: <PlaySquareOutlined />, label: '视频' },
   { key: '/scraper', icon: <CloudDownloadOutlined />, label: '数据采集' },
   { key: '/publish', icon: <SendOutlined />, label: '发布' },
+  { key: '/schedule', icon: <CalendarOutlined />, label: '智能排期' },
   { type: 'divider' },
   { key: '/products', icon: <ShoppingOutlined />, label: '商品' },
   { key: '/content', icon: <EditOutlined />, label: '文案生成' },
   { key: '/pipeline', icon: <ThunderboltOutlined />, label: '自动流水线' },
   { type: 'divider' },
   { key: '/analytics', icon: <BarChartOutlined />, label: '数据分析' },
+  { key: '/account-health', icon: <HeartOutlined />, label: '账号健康' },
+  { key: '/templates', icon: <FileTextOutlined />, label: '模板库' },
 ];
 
 export default function Sidebar() {

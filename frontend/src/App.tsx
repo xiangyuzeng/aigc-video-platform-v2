@@ -12,6 +12,9 @@ import Analytics from "./pages/Analytics";
 import Products from "./pages/Products";
 import ContentGen from "./pages/ContentGen";
 import PipelineRuns from "./pages/PipelineRuns";
+import Templates from "./pages/Templates";
+import AccountHealth from "./pages/AccountHealth";
+import ScheduleQueue from "./pages/ScheduleQueue";
 import SetupWizard from "./pages/SetupWizard";
 import { getSetupStatus } from "./api/appSettings";
 
@@ -38,6 +41,9 @@ export default function App() {
           <Route path="/products" element={<Products />} />
           <Route path="/content" element={<ContentGen />} />
           <Route path="/pipeline" element={<PipelineRuns />} />
+          <Route path="/templates" element={<Templates />} />
+          <Route path="/schedule" element={<ScheduleQueue />} />
+          <Route path="/account-health" element={<AccountHealth />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

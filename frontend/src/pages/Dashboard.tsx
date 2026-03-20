@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Row, Col, Card, Table, Tag, Button, Space, Skeleton, Statistic, Typography } from 'antd';
 import {
   LaptopOutlined,
@@ -11,12 +12,14 @@ import {
   RocketOutlined,
   BarChartOutlined,
   ArrowRightOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { getOverview } from '../api/analytics';
 import { getTasks, type TaskData } from '../api/tasks';
 import { TASK_STATUS } from '../utils/statusLabels';
+import QuickPipeline from '../components/QuickPipeline';
 
 const { Title, Text } = Typography;
 
@@ -97,6 +100,7 @@ const WORKFLOW_STEPS = [
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [quickPipelineOpen, setQuickPipelineOpen] = useState(false);
 
   const { data: overview, isLoading: overviewLoading } = useQuery({
     queryKey: ['analytics-overview'],
@@ -227,7 +231,10 @@ export default function Dashboard() {
       {/* Quick Actions */}
       <Card style={{ marginBottom: 24 }}>
         <Space>
-          <Button type="primary" icon={<RocketOutlined />} onClick={() => navigate('/publish')}>
+          <Button type="primary" icon={<ThunderboltOutlined />} onClick={() => setQuickPipelineOpen(true)}>
+            一键生成
+          </Button>
+          <Button icon={<RocketOutlined />} onClick={() => navigate('/publish')}>
             新建发布
           </Button>
           <Button icon={<UploadOutlined />} onClick={() => navigate('/videos')}>
@@ -241,6 +248,8 @@ export default function Dashboard() {
           </Button>
         </Space>
       </Card>
+
+      <QuickPipeline open={quickPipelineOpen} onClose={() => setQuickPipelineOpen(false)} />
 
       {/* Recent Tasks */}
       <Card title="最近任务">

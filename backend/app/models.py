@@ -199,6 +199,19 @@ class PipelineRun(Base):
     content_piece: Mapped["ContentPiece | None"] = relationship()
 
 
+class Template(Base):
+    """Reusable caption/tag template with variable placeholders"""
+    __tablename__ = "templates"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255))
+    content_template: Mapped[str | None] = mapped_column(Text)  # e.g. "Check out {product_name}! Only {price}!"
+    tags_template: Mapped[str | None] = mapped_column(Text)     # e.g. "#好物推荐 #{category}"
+    variables_json: Mapped[str | None] = mapped_column(Text)    # JSON array of variable names
+    category: Mapped[str | None] = mapped_column(String(100))   # e.g. 好物推荐, 开箱测评
+    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+
+
 class AppSetting(Base):
     """Key-value store for app-level settings"""
     __tablename__ = "app_settings"
