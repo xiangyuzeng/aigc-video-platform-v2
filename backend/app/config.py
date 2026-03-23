@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     adspower_base_url: str = "http://127.0.0.1:50325"
 
     # Scraper
-    scraper_profile_id: str = "k17avugk"
+    scraper_profile_id: str = ""
 
     # Server
     host: str = "0.0.0.0"
