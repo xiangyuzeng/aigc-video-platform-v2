@@ -1,732 +1,1192 @@
-# AIGC Video Platform - Complete User Guide
+# AIGC 电商视频发布平台 — 完整使用指南
 
-> Multi-account social media video publishing platform with AdsPower integration.
-
----
-
-## Table of Contents
-
-1. [Platform Overview](#1-platform-overview)
-2. [Getting Started](#2-getting-started)
-3. [Step 1: Server Setup (服务器)](#3-step-1-server-setup-服务器)
-4. [Step 2: Device Sync (设备)](#4-step-2-device-sync-设备)
-5. [Step 3: Upload Videos (视频)](#5-step-3-upload-videos-视频)
-6. [Step 4: Data Scraping (数据采集)](#6-step-4-data-scraping-数据采集)
-7. [Step 5: Product Management (商品)](#7-step-5-product-management-商品)
-8. [Step 6: AI Content Generation (文案生成)](#8-step-6-ai-content-generation-文案生成)
-9. [Step 7: Batch Publishing (发布)](#9-step-7-batch-publishing-发布)
-10. [Step 8: Smart Scheduling (智能排期)](#10-step-8-smart-scheduling-智能排期)
-11. [Step 9: Auto Pipeline (自动流水线)](#11-step-9-auto-pipeline-自动流水线)
-12. [Step 10: Template Library (模板库)](#12-step-10-template-library-模板库)
-13. [Step 11: Analytics (数据分析)](#13-step-11-analytics-数据分析)
-14. [Step 12: Account Health (账号健康)](#14-step-12-account-health-账号健康)
-15. [Troubleshooting](#15-troubleshooting)
+> 基于 AdsPower 指纹浏览器的多账号社交媒体视频自动发布平台。
 
 ---
 
-## 1. Platform Overview
+## 目录
 
-The AIGC Video Platform is a local-first web application for automating multi-account social media video publishing through **AdsPower** anti-detect browser profiles.
-
-### Key Capabilities
-
-- **Multi-account publishing**: Publish videos across multiple social media accounts simultaneously
-- **AI content generation**: Automatically generate captions, hashtags, descriptions, and video scripts using Claude AI
-- **Product scraping**: Scrape product info from TikTok Shop and other e-commerce platforms
-- **AI video generation**: Generate short videos using Veo 3 via kie.ai
-- **Smart scheduling**: Schedule posts at optimal times with a visual calendar
-- **Pipeline automation**: One-click workflow from product selection to video publishing
-- **Health monitoring**: Track account health scores and publishing success rates
-
-### Dashboard (控制台)
-
-![Dashboard](screenshots/01-dashboard.png)
-
-The dashboard provides a complete overview of your platform:
-
-- **Workflow Guide** (使用流程): A 6-step visual guide showing which steps are completed. Click any step to jump to that page.
-- **Summary Cards**: Shows total devices (设备总数), total videos (视频总数), today's tasks (今日任务), and 7-day success rate (成功率).
-- **Quick Actions**: Shortcut buttons for common tasks — one-click generate (一键生成), new publish (新建发布), upload video (上传视频), sync devices (同步设备), scrape content (采集文案).
-- **Recent Tasks** (最近任务): A table showing your most recent publishing tasks with status (已发布 = published, 失败 = failed).
-
-> **Things to watch out for:**
-> - The connection status indicator in the top-right shows whether the backend WebSocket is connected (已连接) or disconnected (未连接). If disconnected, real-time task updates will not appear.
-> - The success rate is calculated over the last 7 days of publishing tasks.
+1. [平台简介](#1-平台简介)
+2. [环境搭建（Mac 系统）](#2-环境搭建mac-系统)
+3. [环境搭建（Windows 系统）](#3-环境搭建windows-系统)
+4. [API 密钥配置](#4-api-密钥配置)
+5. [启动程序](#5-启动程序)
+6. [控制台（首页）](#6-控制台首页)
+7. [第一步：服务器配置](#7-第一步服务器配置)
+8. [第二步：同步设备](#8-第二步同步设备)
+9. [第三步：上传视频](#9-第三步上传视频)
+10. [第四步：数据采集](#10-第四步数据采集)
+11. [第五步：商品管理](#11-第五步商品管理)
+12. [第六步：AI 文案生成](#12-第六步ai-文案生成)
+13. [第七步：批量发布](#13-第七步批量发布)
+14. [第八步：智能排期](#14-第八步智能排期)
+15. [第九步：自动流水线](#15-第九步自动流水线)
+16. [第十步：模板库](#16-第十步模板库)
+17. [第十一步：数据分析](#17-第十一步数据分析)
+18. [第十二步：账号健康](#18-第十二步账号健康)
+19. [完整操作演示（从零开始）](#19-完整操作演示从零开始)
+20. [常见问题与解决方案](#20-常见问题与解决方案)
 
 ---
 
-## 2. Getting Started
+## 1. 平台简介
 
-### Prerequisites
+本平台是一个**本地运行**的 Web 应用，帮助你通过 AdsPower 指纹浏览器实现**多账号自动化视频发布**。
 
-1. **AdsPower** anti-detect browser installed and running on your machine
-2. **Python 3.11+** for the backend
-3. **Node.js 18+** for the frontend
+### 主要功能
 
-### Starting the Application
+- **多账号发布**：同时向多个社交媒体账号发布视频
+- **AI 文案生成**：使用 Claude AI 自动生成标题、标签、描述和视频脚本
+- **商品采集**：从 TikTok Shop 等电商平台自动抓取商品信息
+- **AI 视频生成**：通过 kie.ai 使用 Veo 3 模型生成短视频
+- **智能排期**：在最佳时间段自动发布，支持日历视图
+- **流水线自动化**：一键完成从商品选择到视频发布的全流程
+- **健康监控**：追踪各账号的发布成功率和健康分数
+
+### 技术架构
+
+本平台分为两个部分：
+- **后端**（Backend）：Python + FastAPI，运行在 `http://localhost:8000`
+- **前端**（Frontend）：React + TypeScript，运行在 `http://localhost:5173`
+
+两个部分都需要同时运行，才能正常使用平台。
+
+---
+
+## 2. 环境搭建（Mac 系统）
+
+> 以下步骤面向**没有编程经验**的用户，请按顺序逐步操作。
+
+### 2.1 安装 Homebrew（Mac 包管理器）
+
+打开 **终端**（Terminal）—— 在 Spotlight 搜索中输入 `Terminal` 即可找到。
+
+复制粘贴以下命令并回车：
 
 ```bash
-# Start backend (port 8000)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+安装过程中可能需要输入你的 Mac 登录密码（输入时屏幕不会显示任何字符，这是正常的）。等待安装完成（约 2-5 分钟）。
+
+### 2.2 安装 Python 3.11+
+
+```bash
+brew install python@3.11
+```
+
+验证安装：
+```bash
+python3 --version
+```
+应该显示 `Python 3.11.x` 或更高版本。
+
+### 2.3 安装 Node.js 18+
+
+```bash
+brew install node@18
+```
+
+验证安装：
+```bash
+node --version
+npm --version
+```
+
+### 2.4 安装 Git
+
+```bash
+brew install git
+```
+
+### 2.5 下载项目代码
+
+```bash
+cd ~/Desktop
+git clone https://github.com/xiangyuzeng/aigc-video-platform-v2.git
+cd aigc-video-platform-v2
+```
+
+### 2.6 设置后端环境
+
+```bash
+# 进入后端目录
 cd backend
-source venv/bin/activate   # or .venv/bin/activate
-uvicorn app.main:app --reload --port 8000
 
-# Start frontend (port 5173) — in a separate terminal
-cd frontend
-npm run dev
+# 创建 Python 虚拟环境
+python3 -m venv venv
+
+# 激活虚拟环境（激活后命令行前面会出现 (venv) 字样）
+source venv/bin/activate
+
+# 安装依赖（可能需要几分钟）
+pip install -r requirements.txt
+
+# 安装 Playwright 浏览器驱动（用于自动化发布）
+playwright install chromium
 ```
 
-Then open **http://localhost:5173** in your browser.
+### 2.7 设置前端环境
 
-### Recommended Workflow Order
+打开一个**新的终端窗口**（Command + N）：
 
-Follow the sidebar groups in order:
+```bash
+# 进入前端目录
+cd ~/Desktop/aigc-video-platform-v2/frontend
 
-1. **基础设置** (Basic Setup): Add servers → Sync devices
-2. **内容准备** (Content Preparation): Upload videos → Scrape data → Manage products → Generate content
-3. **发布管理** (Publish Management): Publish → Schedule → Pipeline → Templates
-4. **数据监控** (Data Monitoring): Analytics → Account health
-
----
-
-## 3. Step 1: Server Setup (服务器)
-
-> **Sidebar**: 基础设置 → 服务器
-
-![Server Setup](screenshots/02-servers.png)
-
-### What This Page Does
-
-Manages connections to your **AdsPower** instances. Each AdsPower installation runs a local API server that this platform communicates with to control browser profiles.
-
-### Inputs
-
-| Field | Description | Example |
-|-------|-------------|---------|
-| **名称** (Name) | A friendly name for this server | `My AdsPower` |
-| **服务器地址** (Server URL) | The AdsPower API endpoint | `http://127.0.0.1:50325` |
-
-### How to Find Your AdsPower URL
-
-1. Open AdsPower desktop application
-2. Go to **API & MCP** settings page
-3. Copy the local API address (usually `http://127.0.0.1:50325`)
-
-### Actions
-
-- **添加服务器** (Add Server): Opens a modal to enter server name and URL
-- **下一步：同步设备** (Next: Sync Devices): Navigates to the device page after adding a server
-- **编辑** (Edit): Modify server name or URL
-- **删除** (Delete): Remove the server and all associated device profiles
-
-### Outputs
-
-A table showing all configured servers with their name, URL, default status, and creation time.
-
-> **Things to watch out for:**
-> - The first server added automatically becomes the **default** (默认). The default server is used when no server is explicitly selected elsewhere.
-> - Make sure AdsPower is running before adding a server, otherwise sync will fail.
-> - Deleting a server will cascade-delete all synced device profiles under it.
-> - The URL must include the port number (e.g., `:50325`).
-
----
-
-## 4. Step 2: Device Sync (设备)
-
-> **Sidebar**: 基础设置 → 设备
-
-![Device Management](screenshots/03-profiles.png)
-
-### What This Page Does
-
-Synchronizes and manages **browser profiles** (devices) from AdsPower. Each profile represents an isolated browser environment typically linked to one social media account.
-
-### How to Sync
-
-1. Select a server from the dropdown (defaults to your default server)
-2. Click **同步设备** (Sync Devices) — this pulls all browser profiles from the AdsPower API
-3. Wait for the sync to complete (a few seconds depending on profile count)
-
-### Actions
-
-- **测试连接** (Test Connection): Verifies the server is reachable
-- **同步设备** (Sync Devices): Fetches all profiles from AdsPower
-- **筛选分组** (Filter by Group): Filter profiles by their AdsPower group
-- **筛选平台** (Filter by Platform): Filter by social media platform
-- **搜索设备** (Search): Search profiles by name
-
-### Table Columns
-
-| Column | Description |
-|--------|-------------|
-| **名称** (Name) | Profile name from AdsPower |
-| **分组** (Group) | The group this profile belongs to in AdsPower |
-| **平台** (Platform) | Social media platform tag |
-| **标签** (Tags) | Custom tags for organizing profiles |
-| **编号** (Serial Number) | AdsPower serial number |
-| **最后同步** (Last Synced) | When this profile was last synced |
-
-> **Things to watch out for:**
-> - **Ungrouped profiles** (未分组) in AdsPower will also be synced. They appear with no group name.
-> - Sync includes a **rate limit delay** (1.5 seconds between group fetches) to avoid overloading the AdsPower API. Large accounts may take 10-20 seconds.
-> - If sync fails with a "Too many requests" error, wait a few seconds and try again.
-> - Profiles are **not** automatically re-synced. You must click "同步设备" manually to update.
-> - Tags and platform labels can be edited per-profile for organization purposes.
-
----
-
-## 5. Step 3: Upload Videos (视频)
-
-> **Sidebar**: 内容准备 → 视频
-
-![Video Library](screenshots/04-videos.png)
-
-### What This Page Does
-
-Manages the video library. Upload short videos (MP4) that will be assigned to devices during the publishing step.
-
-### Inputs
-
-- **Drag & drop** or click the upload area to select video files
-- Supported format: **MP4**
-- Multiple files can be uploaded at once
-
-### Video Card Info
-
-Each video card shows:
-- **Thumbnail**: Auto-generated preview frame
-- **Title**: File name or pipeline-generated name
-- **Duration**: Video length (e.g., 0:08)
-- **Resolution**: Video dimensions (e.g., 960x540)
-- **Status**: `ready` (available for publishing)
-
-### Filters
-
-- **搜索视频** (Search): Search by video title
-- **状态筛选** (Status filter): Filter by video status
-
-> **Things to watch out for:**
-> - Videos generated by the **Auto Pipeline** (自动流水线) will automatically appear here with a `Pipeline #N` prefix.
-> - Large video files may take time to upload — there is no progress bar, so wait for the card to appear.
-> - Videos are stored locally in `backend/data/uploads/`. Ensure sufficient disk space.
-> - Currently only MP4 format is supported.
-
----
-
-## 6. Step 4: Data Scraping (数据采集)
-
-> **Sidebar**: 内容准备 → 数据采集
-
-![Data Scraping](screenshots/05-scraper.png)
-
-### What This Page Does
-
-Scrapes captions, hashtags, and metadata from TikTok videos. Uses an AdsPower browser profile to access TikTok and extract content that you can then use in your own publishing.
-
-### Inputs
-
-| Field | Description | Example |
-|-------|-------------|---------|
-| **TikTok 视频链接** | URL of the TikTok video | `https://www.tiktok.com/@user/video/123...` |
-| **AdsPower Profile ID** | The profile to use for scraping | `k1ac3oq` (found in AdsPower settings) |
-
-### How to Use
-
-1. Go to TikTok, find a video you want to scrape
-2. Click Share → Copy Link
-3. Paste the URL in the input field
-4. Enter your AdsPower Profile ID (found in AdsPower environment management)
-5. Click **采集** (Scrape)
-
-### Outputs
-
-The **采集历史** (Scrape History) table shows:
-- URL that was scraped
-- Timestamp of the scrape
-- **查看** (View) link to see the scraped content
-
-### How the Scraped Data is Used
-
-After scraping, go to the **发布** (Publish) page. In Step 3 (编辑内容), you can click **从URL采集** to load scraped captions and tags, or manually paste them.
-
-> **Things to watch out for:**
-> - The scraping uses a **real AdsPower browser** to navigate TikTok. AdsPower must be running.
-> - The specified Profile ID must exist in your AdsPower and must **not** be currently open/in-use.
-> - TikTok may rate-limit or block rapid scraping. Space out your scrapes.
-> - Some TikTok URLs (especially TikTok Shop product links) will scrape product metadata instead of video content.
-
----
-
-## 7. Step 5: Product Management (商品)
-
-> **Sidebar**: 内容准备 → 商品
-
-![Product Management](screenshots/06-products.png)
-
-### What This Page Does
-
-Manages product information used for AI content generation. Products can be scraped automatically from e-commerce URLs or added manually.
-
-### Adding Products
-
-**Method 1 — URL Scraping** (Recommended):
-1. Paste a product URL (TikTok Shop, FastMoss, etc.) in the top input bar
-2. Click **抓取** (Scrape)
-3. The system automatically extracts: name, price, category, images, description
-
-**Method 2 — Manual Entry**:
-1. Click **手动添加** (Manual Add)
-2. Fill in: name (required), category, price, currency, source URL, description
-3. Click **添加** (Add)
-
-### Product Table
-
-| Column | Description |
-|--------|-------------|
-| **ID** | Auto-incremented identifier |
-| **商品名称** (Product Name) | Clickable — opens detail drawer |
-| **分类** (Category) | Product category tag |
-| **价格** (Price) | Price with currency |
-| **评分** (Score) | AI-generated viral potential score (0-100) |
-| **来源** (Source) | Link icon to the original URL |
-| **操作** (Actions) | Score button + delete button |
-
-### AI Scoring
-
-Click **评分** (Score) to have Claude AI analyze the product's viral potential:
-- **Score** (0-100): Higher = better viral potential. Green (80+), Yellow (60-79), Red (<60)
-- **Reasoning**: AI explains why it gave this score
-- **Suggested Angles**: Marketing angles to use in content
-
-### Detail Drawer
-
-Click any product name to open a detail drawer showing:
-- Score gauge with AI reasoning
-- Basic info (category, price, source URL)
-- Product description
-- Suggested marketing angles
-- Product images (if scraped)
-
-> **Things to watch out for:**
-> - AI scoring requires a valid **Anthropic API key** configured in `backend/.env` as `ANTHROPIC_API_KEY`.
-> - Scraping requires internet access and may fail if the source website blocks automated requests.
-> - Products with scores above 80 are good candidates for content generation and publishing.
-
----
-
-## 8. Step 6: AI Content Generation (文案生成)
-
-> **Sidebar**: 内容准备 → 文案生成
-
-![Content Generation](screenshots/07-content-gen.png)
-
-### What This Page Does
-
-Generates marketing copy, hashtags, descriptions, and video scripts using AI (Claude), based on your product information.
-
-### 3-Step Flow
-
-The page follows a guided 3-step process shown at the top:
-
-#### Step 1: Select Product (选择商品)
-- Use the searchable dropdown to find and select a product
-- If no products exist, click "去添加商品" to navigate to the Products page
-
-#### Step 2: Configure & Generate (配置并生成)
-
-**Content Style** (内容风格) — Choose one:
-| Style | Chinese | Description |
-|-------|---------|-------------|
-| Product Review | 产品测评 | Detailed product analysis |
-| Unboxing | 开箱体验 | First-look unboxing experience |
-| Lifestyle | 生活方式 | Lifestyle integration content |
-| Comparison | 对比评测 | Comparing with alternatives |
-| Tutorial | 使用教程 | How-to usage guide |
-| Problem/Solution | 痛点解决 | Solving a pain point |
-
-**Video Model** (视频模型):
-| Model | Description |
-|-------|-------------|
-| Veo 3 Fast | Fast generation, good for batch production |
-| Veo 3 | Higher quality generation |
-
-**Video Duration** (视频时长):
-- **5 秒** or **8 秒** (Veo 3 models max out at 8 seconds)
-
-**Action Buttons**:
-- **一键生成（文案 + 脚本）**: Generates BOTH caption/tags AND video script in one click (recommended)
-- **仅生成文案**: Generates only caption, hashtags, and description
-- **仅生成脚本**: Generates only the video script
-
-#### Step 3: Results & Next Steps (结果与下一步)
-
-After generation, you'll see:
-- **标题文案** (Caption): The main post caption (copyable)
-- **标签** (Tags): Hashtags in blue tags
-- **描述** (Description): Longer post description (copyable)
-- **视频脚本** (Video Script): Hook, body, CTA structure for the video
-- **翻译** (Translation): Optional — translate content into multiple languages (中文, English, Espanol, etc.)
-
-**Next action buttons**:
-- **创建自动流水线**: Jump to pipeline to auto-generate video + publish
-- **手动发布**: Jump to publish wizard to manually assign and publish
-- **返回列表**: Go back to see all generated content for this product
-
-> **Things to watch out for:**
-> - Requires `ANTHROPIC_API_KEY` in `.env` — content generation will fail without it.
-> - Each generation creates a new content piece stored in the database. Use "已有文案" (existing content) to reuse previous generations.
-> - The video duration must match the selected model's capability. Veo 3 models support max **8 seconds**.
-> - Translation is optional and can be done after initial generation.
-> - The "一键生成" button runs two API calls sequentially, so it takes about twice as long as individual generation.
-
----
-
-## 9. Step 7: Batch Publishing (发布)
-
-> **Sidebar**: 发布管理 → 发布
-
-![Batch Publishing](screenshots/08-publish.png)
-
-### What This Page Does
-
-The main publishing wizard — select devices, assign videos, edit captions/tags, and publish to multiple accounts simultaneously.
-
-### 4-Step Wizard
-
-#### Step 1: Select Devices (选择设备)
-
-- Select a server from the dropdown
-- Click **同步设备** to refresh the device list
-- Each device card shows: name, group tags, platform tags, serial number
-- **Check** the devices you want to publish to
-- Use **全选当前分组** (Select All in Group) for bulk selection
-- Filter by group or platform using the dropdown filters
-- The badge shows how many devices are selected (已选设备)
-
-#### Step 2: Assign Videos (分配视频)
-
-- For each selected device, assign a video
-- Options: assign the same video to all, or different videos per device
-- Videos come from the Video Library (视频)
-
-#### Step 3: Edit Content (编辑内容)
-
-- Edit the caption, hashtags, and description for each device
-- **从URL采集** (From URL Scrape): Load content from a previously scraped TikTok video
-- Each device can have unique or shared content
-
-#### Step 4: Confirm & Publish (确认发布)
-
-- Review all assignments
-- Click **发布** to start publishing
-- Tasks are created and executed via AdsPower browser automation
-
-### Top Actions
-
-- **保存草稿** (Save Draft): Save current wizard state for later
-- **恢复草稿** (Restore Draft): Load a previously saved draft
-- **重置** (Reset): Clear all selections and start over
-
-> **Things to watch out for:**
-> - Publishing opens **real browser windows** via AdsPower. Ensure AdsPower is running and not busy with other tasks.
-> - Each publish task takes 1-3 minutes per device as it automates the browser.
-> - **Do not** interact with AdsPower browsers while publishing is in progress.
-> - Failed tasks can be retried from the dashboard or analytics page.
-> - The connection status (top-right) must show "已连接" for real-time status updates.
-
----
-
-## 10. Step 8: Smart Scheduling (智能排期)
-
-> **Sidebar**: 发布管理 → 智能排期
-
-![Smart Scheduling](screenshots/09-schedule.png)
-
-### What This Page Does
-
-Schedule publishing tasks for optimal times. Features a visual calendar and recommended TikTok posting windows.
-
-### Key Features
-
-**Recommended Time Slots** (TikTok 最佳发布时段):
-- Morning (早间): 7:00-9:00
-- Afternoon (午间): 12:00-14:00
-- Evening (晚间): 18:00-21:00
-
-**Summary Cards**:
-- **排队中** (Queued): Tasks waiting to execute
-- **今日发布** (Published Today): Tasks completed today
-- **失败（可重试）** (Failed, Retryable): Failed tasks that can be retried
-
-**Calendar View** (排期日历):
-- Month/Year navigation
-- Today highlighted in blue
-- Days with scheduled tasks show indicators
-- Click a day to see its tasks
-
-**Task Tabs**:
-- **全部** (All): All scheduled tasks
-- **排队中** (Queued): Pending tasks
-- **已发布** (Published): Completed tasks
-- **失败** (Failed): Failed tasks
-
-### Creating a Scheduled Task
-
-1. Click **新建排期** (New Schedule) or **创建排期** (Create Schedule)
-2. Select devices, videos, and content
-3. Set the scheduled date and time
-4. The task will automatically execute at the scheduled time
-
-> **Things to watch out for:**
-> - The date range picker at the top-right controls which period is shown in the calendar.
-> - Scheduled tasks require the **backend to be running** at the scheduled time. If the server is stopped, tasks won't execute.
-> - The timezone defaults to `America/Mexico_City` — configure `DEFAULT_TIMEZONE` in `.env` to change.
-> - Tasks execute via AdsPower automation, so AdsPower must also be running at the scheduled time.
-
----
-
-## 11. Step 9: Auto Pipeline (自动流水线)
-
-> **Sidebar**: 发布管理 → 自动流水线
-
-![Auto Pipeline](screenshots/10-pipeline.png)
-
-### What This Page Does
-
-One-click automation from content generation to video creation to publishing. This is the most powerful feature — it chains together all the steps automatically.
-
-### Pipeline Table
-
-| Column | Description |
-|--------|-------------|
-| **ID** | Pipeline run ID |
-| **状态** (Status) | 已完成 (completed), 失败 (failed), 运行中 (running) |
-| **进度** (Progress) | Visual progress bar — green (success), red (failed) |
-| **视频来源** (Video Source) | `Kie.ai 生成` (AI-generated), `ai_generate`, or `upload` |
-| **风格** (Style) | Content style (产品测评, 开箱体验, etc.) |
-| **创建时间** | When the pipeline was started |
-| **操作** (Actions) | Resume (▶), Delete (🗑) |
-
-### Creating a Pipeline
-
-1. Click **新建流水线** (New Pipeline)
-2. A wizard modal appears:
-   - Select a product
-   - Choose video source: **Kie.ai** (AI video), **MoviePy** (slideshow), or **Upload** (existing video)
-   - Select target devices
-   - Optionally schedule for a specific time
-3. Click confirm to start
-
-### Pipeline Stages
-
-Depending on video source, the pipeline runs through these stages:
-
-**Kie.ai flow** (AI video generation):
-```
-Content Generation → Script Generation → AI Video Generation → Subtitle Generation → Video Finalization → Publish
+# 安装依赖（可能需要 1-2 分钟）
+npm install
 ```
 
-**MoviePy flow** (slideshow from images):
-```
-Content Generation → Script Generation → Image Generation → TTS Generation → Video Assembly → Subtitle Generation → Video Finalization → Publish
-```
+### 2.8 创建环境配置文件
 
-**Upload flow** (use existing video):
-```
-Content Generation → Subtitle Generation → Video Finalization → Publish
-```
+```bash
+# 回到后端目录
+cd ~/Desktop/aigc-video-platform-v2/backend
 
-Click the **+** expand button on any row to see detailed stage-by-stage progress.
+# 创建 .env 文件
+cat > .env << 'EOF'
+# AI 文案生成（必填 —— 没有这个密钥无法生成文案）
+ANTHROPIC_API_KEY=在这里填入你的Anthropic密钥
 
-> **Things to watch out for:**
-> - **AI Video Generation** requires `KIE_API_KEY` in `.env` — this is the kie.ai API key for Veo 3 access.
-> - Video generation can take **2-5 minutes** per video. The system polls kie.ai every 10 seconds.
-> - Failed pipelines can be **resumed** from the failed stage — click the ▶ button. You don't need to restart from scratch.
-> - The pipeline runs in the background. You can navigate to other pages while it executes.
-> - Pipeline-generated videos automatically appear in the Video Library.
+# AI 视频生成（使用自动流水线时必填）
+KIE_API_KEY=在这里填入你的kie.ai密钥
 
----
-
-## 12. Step 10: Template Library (模板库)
-
-> **Sidebar**: 发布管理 → 模板库
-
-![Template Library](screenshots/11-templates.png)
-
-### What This Page Does
-
-Save and reuse common publishing configurations as templates. Speeds up repetitive publishing workflows.
-
-### Creating a Template
-
-1. Click **新建模板** (New Template)
-2. Configure:
-   - Template name
-   - Default caption and hashtags
-   - Content style
-   - Target device groups
-3. Save the template
-
-### Using a Template
-
-When creating a new publish task or pipeline, you can load a template to pre-fill the configuration.
-
-> **Things to watch out for:**
-> - Templates save the **configuration** (style, captions, tags), not the specific videos or devices.
-> - Templates are useful when you publish the same type of content repeatedly across the same device groups.
-
----
-
-## 13. Step 11: Analytics (数据分析)
-
-> **Sidebar**: 数据监控 → 数据分析
-
-![Analytics](screenshots/12-analytics.png)
-
-### What This Page Does
-
-Visualizes publishing performance with charts and statistics. Shows trends over time and success/failure ratios.
-
-### Key Elements
-
-**Date Range Picker**: Select the period to analyze. Presets: 最近7天 (Last 7 days), 最近30天 (Last 30 days).
-
-**Charts** (appear when data exists):
-- **发布趋势** (Publishing Trend): Line chart showing daily published vs. failed counts
-- **成功/失败占比** (Success/Failure Ratio): Donut/pie chart
-
-**Summary Cards**:
-| Card | Description |
-|------|-------------|
-| **发布成功** | Total successful publishes in the selected period |
-| **发布失败** | Total failed publishes |
-| **成功率** | Percentage of successful publishes |
-
-### Empty State
-
-When no data exists for the selected date range, the page shows a helpful message:
-- If tasks are queued/running: "任务排队/执行中，完成后数据自动显示"
-- If published data exists outside the range: "请尝试选择更大的日期范围"
-- If no tasks exist at all: "还没有发布任务" with action buttons to navigate to Publish or Pipeline
-
-> **Things to watch out for:**
-> - Data comes from **completed** publishing tasks only (status = `published` or `failed`).
-> - Tasks that are still queued or in-progress are not counted in the charts.
-> - The success rate color: Green (≥80%), Red (<80%).
-> - Use the "最近30天" preset to get a broader view if the 7-day view is empty.
-
----
-
-## 14. Step 12: Account Health (账号健康)
-
-> **Sidebar**: 数据监控 → 账号健康
-
-![Account Health](screenshots/13-account-health.png)
-
-### What This Page Does
-
-Monitors the publishing success rate and overall health of each device/account. Helps identify accounts that need attention.
-
-### Summary Cards
-
-| Card | Description |
-|------|-------------|
-| **设备总数** (Total Devices) | Number of synced devices |
-| **平均健康分数** (Avg Health Score) | Average across all devices (0-100) |
-| **有警告的设备** (Devices with Alerts) | Number of devices flagged with warnings |
-
-### Health Table
-
-| Column | Description |
-|--------|-------------|
-| **设备名称** (Device Name) | Profile name from AdsPower |
-| **分组** (Group) | Device group, with filter dropdown |
-| **发布总数** (Total Posts) | Number of publishing tasks for this device |
-| **成功率** (Success Rate) | Percentage of successful publishes |
-| **最后发布** (Last Published) | Timestamp of last publish, or "从未发布" (never) |
-| **健康分数** (Health Score) | Visual progress bar (0-100) |
-| **警告** (Alerts) | Green "正常" (normal) or red warning tags |
-
-### Health Score Calculation
-
-- **Success**: score ≥ 70 (green progress bar)
-- **Normal**: score 40-69 (blue progress bar)
-- **Exception**: score < 40 (red progress bar)
-
-### Alerts
-
-Common alert types:
-- **从未发布过** (Never published): Device has no publishing history
-- Low success rate warnings
-
-### Export
-
-Click **导出 CSV** (Export CSV) to download the health data as a spreadsheet.
-
-> **Things to watch out for:**
-> - Health scores update every 60 seconds automatically (auto-refresh).
-> - Devices with health scores below 40 should be investigated — they may have account issues.
-> - A device showing "从未发布过" is not necessarily unhealthy — it just hasn't been used yet.
-> - The group filter dropdown is dynamically built from your actual device data.
-
----
-
-## 15. Troubleshooting
-
-### Common Issues
-
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| "未连接" (Disconnected) in header | Backend WebSocket lost | Restart backend: `uvicorn app.main:app --reload` |
-| Sync devices returns empty | AdsPower not running | Start AdsPower application first |
-| "Too many requests" during sync | AdsPower API rate limit | Wait 5 seconds and retry |
-| Content generation fails | Missing API key | Set `ANTHROPIC_API_KEY` in `backend/.env` |
-| Pipeline video generation fails | Missing kie.ai key | Set `KIE_API_KEY` in `backend/.env` |
-| Publishing task stuck | AdsPower browser issue | Check if AdsPower profile is accessible, then retry the task |
-| Analytics page shows empty | No completed tasks in date range | Expand the date range using "最近30天" preset |
-
-### Environment Variables
-
-Key settings in `backend/.env`:
-
-```env
-# Required for AI content generation
-ANTHROPIC_API_KEY=sk-ant-...
-
-# Required for AI video generation via kie.ai
-KIE_API_KEY=your-kie-api-key
-
-# Optional: OpenAI for image generation
-OPENAI_API_KEY=sk-...
-
-# AdsPower default server
+# AdsPower 默认地址（通常不需要修改）
 ADSPOWER_BASE_URL=http://127.0.0.1:50325
 
-# Scraper profile ID
-SCRAPER_PROFILE_ID=k17avugk
+# 时区设置
+DEFAULT_TIMEZONE=America/Mexico_City
+EOF
+```
 
-# Default timezone for scheduling
+> **重要**：`.env` 文件中的密钥需要替换成你自己的真实密钥。详见[第 4 节：API 密钥配置](#4-api-密钥配置)。
+
+### 2.9 初始化数据库
+
+```bash
+cd ~/Desktop/aigc-video-platform-v2/backend
+source venv/bin/activate
+alembic upgrade head
+```
+
+### 2.10 安装 AdsPower
+
+1. 访问 [AdsPower 官网](https://www.adspower.com/) 下载 Mac 版本
+2. 安装并打开 AdsPower
+3. **注册或登录** AdsPower 账号
+4. 在 AdsPower 中创建至少一个浏览器环境（Profile）
+
+---
+
+## 3. 环境搭建（Windows 系统）
+
+> 以下步骤面向**没有编程经验**的用户。
+
+### 3.1 安装 Python 3.11+
+
+1. 打开浏览器，访问 https://www.python.org/downloads/
+2. 点击 **Download Python 3.11.x** 按钮
+3. 运行下载的安装程序
+4. **重要**：安装界面底部勾选 **"Add Python to PATH"**（必须勾选！）
+5. 点击 **Install Now**
+
+验证安装 —— 打开 **命令提示符**（按 Win + R，输入 `cmd`，回车）：
+```cmd
+python --version
+```
+
+### 3.2 安装 Node.js 18+
+
+1. 访问 https://nodejs.org/
+2. 下载 **LTS 版本**（推荐的长期支持版本）
+3. 运行安装程序，一路点击 Next 即可
+
+验证安装：
+```cmd
+node --version
+npm --version
+```
+
+### 3.3 安装 Git
+
+1. 访问 https://git-scm.com/download/win
+2. 下载并安装，所有选项保持默认即可
+
+### 3.4 下载项目代码
+
+打开 **命令提示符**：
+```cmd
+cd %USERPROFILE%\Desktop
+git clone https://github.com/xiangyuzeng/aigc-video-platform-v2.git
+cd aigc-video-platform-v2
+```
+
+### 3.5 设置后端环境
+
+```cmd
+cd backend
+
+:: 创建虚拟环境
+python -m venv venv
+
+:: 激活虚拟环境（Windows 用这个命令）
+venv\Scripts\activate
+
+:: 安装依赖
+pip install -r requirements.txt
+
+:: 安装浏览器驱动
+playwright install chromium
+```
+
+### 3.6 设置前端环境
+
+打开**另一个命令提示符窗口**：
+```cmd
+cd %USERPROFILE%\Desktop\aigc-video-platform-v2\frontend
+npm install
+```
+
+### 3.7 创建环境配置文件
+
+在 `backend` 目录下创建文件 `.env`（注意文件名以点开头）：
+
+1. 打开记事本
+2. 输入以下内容：
+
+```
+ANTHROPIC_API_KEY=在这里填入你的Anthropic密钥
+KIE_API_KEY=在这里填入你的kie.ai密钥
+ADSPOWER_BASE_URL=http://127.0.0.1:50325
 DEFAULT_TIMEZONE=America/Mexico_City
 ```
 
-### API Endpoints Reference
+3. 点击 文件 → 另存为
+4. 文件名输入 `.env`（注意前面有个点）
+5. 保存类型选择 **所有文件 (*.*)**
+6. 保存到 `backend` 文件夹中
 
-All API endpoints are at `http://localhost:8000/api/`:
+### 3.8 初始化数据库
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/servers/` | List all servers |
-| `POST /api/servers/{id}/sync` | Sync devices from server |
-| `GET /api/profiles/` | List all devices |
-| `GET /api/videos/` | List all videos |
-| `POST /api/videos/upload` | Upload a video |
-| `GET /api/products/` | List products |
-| `POST /api/products/scrape` | Scrape product from URL |
-| `POST /api/content/generate` | Generate AI content |
-| `POST /api/content/generate-script` | Generate video script |
-| `GET /api/tasks/` | List publishing tasks |
-| `POST /api/pipeline/run` | Start a pipeline |
-| `GET /api/analytics/` | Get overview statistics |
-| `GET /api/analytics/timeline` | Get timeline chart data |
-| `GET /api/health-dashboard/` | Get account health data |
-| `GET /api/templates/` | List templates |
+```cmd
+cd %USERPROFILE%\Desktop\aigc-video-platform-v2\backend
+venv\Scripts\activate
+alembic upgrade head
+```
+
+### 3.9 安装 AdsPower
+
+1. 访问 [AdsPower 官网](https://www.adspower.com/) 下载 Windows 版本
+2. 安装并打开 AdsPower
+3. **注册或登录** AdsPower 账号
+4. 创建至少一个浏览器环境
+
+---
+
+## 4. API 密钥配置
+
+本平台依赖以下外部服务的 API 密钥。你需要分别注册并获取这些密钥。
+
+### 4.1 Anthropic API 密钥（必填 — AI 文案生成）
+
+这是用于 AI 文案生成的核心密钥，**没有这个密钥，文案生成和商品评分功能将无法使用**。
+
+**获取步骤：**
+
+1. 访问 https://console.anthropic.com/
+2. 点击 **Sign Up** 注册账号（需要邮箱验证）
+3. 登录后，点击左侧菜单的 **API Keys**
+4. 点击 **Create Key** 创建一个新密钥
+5. 复制密钥（格式类似 `sk-ant-api03-...`）
+6. 将密钥粘贴到 `backend/.env` 文件中的 `ANTHROPIC_API_KEY=` 后面
+
+> **注意**：Anthropic API 是按使用量计费的。新账号通常有免费额度。每次文案生成大约消耗 $0.01-0.05。
+
+### 4.2 kie.ai API 密钥（自动流水线视频生成时必填）
+
+这是用于 AI 视频生成的密钥。只有在使用「自动流水线」中的 Veo 3 视频生成功能时才需要。
+
+**获取步骤：**
+
+1. 访问 https://kie.ai/
+2. 注册并登录账号
+3. 进入个人中心或 API 设置页面
+4. 创建 API Key
+5. 复制密钥
+6. 粘贴到 `.env` 文件中的 `KIE_API_KEY=` 后面
+
+> **注意**：kie.ai 的 Veo 3 模型生成视频最长 8 秒。每次生成约需 2-5 分钟，有使用费用。
+
+### 4.3 AdsPower 本地 API 地址（从 AdsPower 客户端获取）
+
+AdsPower 运行时会在本地启动一个 API 服务，本平台通过这个 API 来控制浏览器环境。
+
+**获取步骤：**
+
+1. 打开 AdsPower 客户端
+2. **确保你已经登录** AdsPower 账号
+3. 点击顶部菜单栏的 **API & MCP**（或在设置中找到）
+4. 你会看到类似 `http://local.adspower.com:50325` 或 `http://127.0.0.1:50325` 的地址
+5. 复制这个地址
+6. 这个地址就是你在本平台「服务器」页面中需要填入的 **服务器地址**
+
+> **重要提醒：**
+> - AdsPower 必须**保持运行**状态，否则平台无法同步设备和发布视频
+> - 如果 AdsPower 的端口不是 50325（例如是 50326），请使用实际显示的端口
+> - 每台电脑上运行的 AdsPower 地址可能不同，请以实际显示为准
+
+### 4.4 配置文件完整示例
+
+编辑 `backend/.env` 文件，填入所有密钥后应该类似这样：
+
+```env
+# AI 文案生成密钥（必填）
+ANTHROPIC_API_KEY=sk-ant-api03-xxxxxxxxxxxxxxxxxxxxxxxx
+
+# AI 视频生成密钥（流水线功能需要）
+KIE_API_KEY=kie_xxxxxxxxxxxxxxxxxxxx
+
+# AdsPower 地址（通常不需要修改，使用默认值即可）
+ADSPOWER_BASE_URL=http://127.0.0.1:50325
+
+# 采集功能使用的 AdsPower Profile ID
+SCRAPER_PROFILE_ID=你的ProfileID
+
+# 时区（根据你的所在地修改）
+DEFAULT_TIMEZONE=America/Mexico_City
+```
+
+---
+
+## 5. 启动程序
+
+每次使用本平台，都需要启动三个程序：**AdsPower**、**后端服务**和**前端服务**。
+
+### 5.1 启动 AdsPower
+
+1. 打开 AdsPower 应用
+2. **登录**你的 AdsPower 账号
+3. 确认能看到你的浏览器环境列表
+
+### 5.2 启动后端服务
+
+**Mac：**
+```bash
+cd ~/Desktop/aigc-video-platform-v2/backend
+source venv/bin/activate
+uvicorn app.main:app --reload --port 8000
+```
+
+**Windows：**
+```cmd
+cd %USERPROFILE%\Desktop\aigc-video-platform-v2\backend
+venv\Scripts\activate
+uvicorn app.main:app --reload --port 8000
+```
+
+看到类似以下输出表示后端启动成功：
+```
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Application startup complete.
+```
+
+> **不要关闭这个终端窗口！** 关闭后后端服务会停止。
+
+### 5.3 启动前端服务
+
+打开**另一个终端/命令提示符窗口**：
+
+**Mac：**
+```bash
+cd ~/Desktop/aigc-video-platform-v2/frontend
+npm run dev
+```
+
+**Windows：**
+```cmd
+cd %USERPROFILE%\Desktop\aigc-video-platform-v2\frontend
+npm run dev
+```
+
+看到类似以下输出表示前端启动成功：
+```
+VITE v6.x.x  ready in xxx ms
+➜  Local:   http://localhost:5173/
+```
+
+### 5.4 打开平台
+
+在浏览器中访问：**http://localhost:5173**
+
+你应该能看到平台的控制台页面。右上角应显示「已连接」状态。
+
+> **常见启动问题：**
+> - 如果显示「未连接」：检查后端是否正常运行（终端是否有报错）
+> - 如果页面白屏：检查前端终端是否有报错信息
+> - 如果端口被占用：确认没有其他程序在使用 8000 或 5173 端口
+
+---
+
+## 6. 控制台（首页）
+
+> **侧边栏位置**：控制台
+
+![控制台](screenshots/01-dashboard.png)
+
+### 页面说明
+
+控制台是平台的总览页面，展示关键数据和快捷入口。
+
+### 页面元素
+
+| 区域 | 说明 |
+|------|------|
+| **使用流程** | 6 步引导图，显示每个步骤的完成状态。点击任意步骤可跳转到对应页面 |
+| **设备总数** | 已同步的 AdsPower 浏览器环境数量 |
+| **视频总数** | 视频库中的视频数量 |
+| **今日任务** | 今天创建的发布任务数量 |
+| **成功率（7天）** | 最近 7 天的发布成功率（绿色 ≥ 60%，红色 < 60%） |
+| **快捷操作按钮** | 一键生成、新建发布、上传视频、同步设备、采集文案 |
+| **最近任务** | 最近的发布任务列表，显示状态（已发布/失败）和创建时间 |
+
+### 注意事项
+
+- 右上角的连接状态指示器：「已连接」表示后端 WebSocket 正常，「未连接」表示后端服务可能没有启动
+- 第一次使用时，所有数据都是空的，需要按照使用流程逐步操作
+
+---
+
+## 7. 第一步：服务器配置
+
+> **侧边栏位置**：基础设置 → 服务器
+
+![服务器配置](screenshots/02-servers.png)
+
+### 页面说明
+
+管理 AdsPower 服务器的连接。本平台通过 AdsPower 的本地 API 来控制浏览器环境。
+
+### 操作步骤
+
+1. 点击右上角 **「添加服务器」** 按钮
+2. 在弹出的对话框中填写：
+   - **名称**：给这个服务器起个名字（例如「我的 AdsPower」）
+   - **服务器地址**：填入 AdsPower API 地址（参见[第 4.3 节](#43-adspower-本地-api-地址从-adspower-客户端获取)）
+3. 点击确定保存
+
+### 如何从 AdsPower 获取服务器地址
+
+1. 打开 AdsPower 客户端，**确保已登录**
+2. 点击顶部的 **API & MCP** 菜单
+3. 复制显示的 API 地址（通常是 `http://127.0.0.1:50325`）
+
+### 输出结果
+
+添加成功后，服务器会出现在表格中，显示名称、地址、是否为默认服务器、创建时间等信息。
+
+### 注意事项
+
+- 第一个添加的服务器会自动设为**默认**（显示蓝色「默认」标签）
+- 添加服务器前必须确保 AdsPower 正在运行
+- 添加成功后，点击 **「下一步：同步设备」** 进入设备同步
+- 删除服务器会同时删除该服务器下所有已同步的设备数据
+
+---
+
+## 8. 第二步：同步设备
+
+> **侧边栏位置**：基础设置 → 设备
+
+![设备管理](screenshots/03-profiles.png)
+
+### 页面说明
+
+从 AdsPower 同步浏览器环境（设备）。每个设备代表一个独立的浏览器环境，通常对应一个社交媒体账号。
+
+### 操作步骤
+
+1. 从顶部下拉菜单选择服务器（默认已选择默认服务器）
+2. 可选：点击 **「测试连接」** 确认服务器可达
+3. 点击 **「同步设备」** 按钮
+4. 等待同步完成（通常几秒钟，设备多时可能需要 10-20 秒）
+
+### 同步完成后
+
+表格中会显示所有从 AdsPower 同步过来的浏览器环境：
+
+| 列名 | 说明 |
+|------|------|
+| **名称** | AdsPower 中的环境名称 |
+| **分组** | 环境所属的分组 |
+| **平台** | 关联的社交媒体平台 |
+| **标签** | 可自定义的标签 |
+| **编号** | AdsPower 中的序号 |
+| **最后同步** | 上次同步的时间 |
+
+### 筛选功能
+
+- **筛选分组**：按 AdsPower 中的分组筛选
+- **筛选平台**：按平台（如 TikTok）筛选
+- **搜索设备**：按名称搜索
+
+### 注意事项
+
+- 未分组的环境也会被同步（显示为无分组名）
+- 同步过程中会自动添加延迟（1.5 秒/批），避免触发 AdsPower API 限流
+- 如果遇到「Too many requests」错误，等待几秒后重试
+- 设备列表**不会自动更新**。每次在 AdsPower 中新增或删除环境后，需要手动点击「同步设备」
+
+---
+
+## 9. 第三步：上传视频
+
+> **侧边栏位置**：内容准备 → 视频
+
+![视频库](screenshots/04-videos.png)
+
+### 页面说明
+
+管理要发布的视频文件。上传 MP4 格式的短视频，发布时会将视频分配给各个设备。
+
+### 操作步骤
+
+1. 将 MP4 文件**拖放**到上传区域，或点击上传区域选择文件
+2. 可同时上传多个文件
+3. 上传完成后，视频卡片会自动出现在下方
+
+### 视频卡片信息
+
+每张卡片显示：
+- **缩略图**：视频首帧预览
+- **标题**：文件名或流水线自动生成的名称
+- **时长**：视频长度（如 0:08）
+- **分辨率**：视频尺寸（如 960x540）
+- **状态**：`ready` 表示可用于发布
+
+### 注意事项
+
+- 仅支持 **MP4** 格式
+- 自动流水线生成的视频会自动出现在这里（标题前缀为 `Pipeline #N`）
+- 视频文件存储在 `backend/data/uploads/` 目录，请确保磁盘空间充足
+- 上传大文件时没有进度条显示，请耐心等待卡片出现
+
+---
+
+## 10. 第四步：数据采集
+
+> **侧边栏位置**：内容准备 → 数据采集
+
+![数据采集](screenshots/05-scraper.png)
+
+### 页面说明
+
+从 TikTok 视频中采集文案、标签等内容信息。采集到的内容可以在发布时直接使用。
+
+### 操作步骤
+
+1. 在 TikTok 上找到想要采集的视频
+2. 点击分享 → 复制链接
+3. 将链接粘贴到 **「TikTok 视频链接」** 输入框中
+4. 在 **「AdsPower Profile ID」** 中输入用于采集的环境 ID
+5. 点击 **「采集」** 按钮
+
+### 如何获取 AdsPower Profile ID
+
+1. 打开 AdsPower 客户端
+2. 在环境管理中找到你要用于采集的环境
+3. 复制该环境的 **Profile ID**（一串字母数字组合，如 `k1ac3oq`）
+
+### 采集示例
+
+```
+TikTok 链接：https://www.tiktok.com/@username/video/7361677669088694...
+Profile ID：k1ac3oq
+```
+
+### 采集结果
+
+采集历史表格显示所有采集记录，包含 URL、采集时间和查看按钮。采集到的文案和标签可以在「发布」页面中使用。
+
+### 注意事项
+
+- 采集使用**真实的 AdsPower 浏览器**打开 TikTok，所以 AdsPower 必须运行
+- 指定的 Profile ID 对应的浏览器环境**不能正在被使用**（不能处于打开状态）
+- TikTok 可能会限制频繁采集，请间隔一段时间再采集
+- TikTok Shop 商品链接会采集商品数据而非视频内容
+
+---
+
+## 11. 第五步：商品管理
+
+> **侧边栏位置**：内容准备 → 商品
+
+![商品管理](screenshots/06-products.png)
+
+### 页面说明
+
+管理用于 AI 文案生成的商品信息。支持从电商 URL 自动抓取或手动添加。
+
+### 方式一：URL 自动抓取（推荐）
+
+1. 在顶部输入框粘贴商品 URL（支持 TikTok Shop、FastMoss 等）
+2. 点击 **「抓取」**
+3. 系统自动提取：商品名称、价格、分类、图片、描述
+
+**示例 URL：**
+```
+https://shop.tiktok.com/us/pdp/neuro-energy-caffeine-gum...
+https://www.fastmoss.com/zh/media-source/video/761677...
+```
+
+### 方式二：手动添加
+
+1. 点击 **「手动添加」**
+2. 填写信息：
+   - **商品名称**（必填）：如「便携式搅拌机」
+   - **分类**：如「Kitchen Appliances」
+   - **价格**：如 `24.99`
+   - **货币**：如 `USD`
+   - **来源 URL**：商品原始链接
+   - **描述**：商品详细描述
+3. 点击 **「添加」**
+
+### AI 评分功能
+
+点击任意商品右侧的 **「评分」** 按钮，AI 会分析该商品的带货潜力：
+
+- **分数**（0-100）：越高越适合推广
+  - 绿色（80+）：很适合推广
+  - 黄色（60-79）：可以推广
+  - 红色（<60）：不太适合
+- **评分理由**：AI 解释为什么给这个分数
+- **推荐营销角度**：建议的推广方向
+
+### 注意事项
+
+- AI 评分需要 `ANTHROPIC_API_KEY`，没有配置会报错
+- 点击商品名称可以打开详情面板，查看完整信息
+- 商品数据是后续「文案生成」的基础，先添加商品再生成文案
+
+---
+
+## 12. 第六步：AI 文案生成
+
+> **侧边栏位置**：内容准备 → 文案生成
+
+![AI 文案生成](screenshots/07-content-gen.png)
+
+### 页面说明
+
+基于商品信息，使用 AI（Claude）自动生成营销文案、标签、描述和视频脚本。
+
+### 三步操作流程
+
+页面顶部有步骤指示器：**选择商品 → 配置并生成 → 结果与下一步**
+
+#### 步骤 1：选择商品
+
+从下拉菜单中搜索并选择一个已添加的商品。如果没有商品，点击「去添加商品」跳转到商品页面。
+
+#### 步骤 2：配置风格与视频模型
+
+**内容风格**（选择一种）：
+
+| 风格 | 说明 | 适用场景 |
+|------|------|----------|
+| 产品测评 | 详细的产品分析 | 专业评测类内容 |
+| 开箱体验 | 第一次打开产品 | 新品展示 |
+| 生活方式 | 产品融入日常生活 | 软性推广 |
+| 对比评测 | 与竞品对比 | 突出优势 |
+| 使用教程 | 教别人怎么用 | 实用类内容 |
+| 痛点解决 | 解决某个问题 | 需求驱动型 |
+
+**视频模型**：
+
+| 模型 | 说明 |
+|------|------|
+| Veo 3 Fast | 快速生成，适合批量制作 |
+| Veo 3 | 更高质量的生成 |
+
+**视频时长**：5 秒 或 8 秒（Veo 3 系列最长支持 8 秒）
+
+#### 生成操作
+
+- **一键生成（文案 + 脚本）**：推荐！同时生成文案和视频脚本
+- **仅生成文案**：只生成标题、标签、描述
+- **仅生成脚本**：只生成视频脚本
+
+#### 步骤 3：查看结果
+
+生成完成后会显示：
+- **标题文案**：可复制的主标题
+- **标签**：蓝色标签列表
+- **描述**：详细描述（可展开/复制）
+- **视频脚本**：包含 Hook（开头吸引）、Body（主体内容）、CTA（号召行动）
+
+### 后续操作
+
+- **创建自动流水线**：跳转到流水线页面，自动生成视频并发布
+- **手动发布**：跳转到发布向导，手动分配视频和内容
+- **翻译**：选择目标语言，将内容翻译成多国语言
+
+### 注意事项
+
+- **必须配置 `ANTHROPIC_API_KEY`**，否则所有生成功能都会失败
+- 每次生成会创建新的文案记录，可以在「已有文案」列表中查看历史
+- 「一键生成」会依次调用两个 API，耗时约为单次生成的 2 倍
+- 视频时长选项会根据选择的模型自动调整
+
+---
+
+## 13. 第七步：批量发布
+
+> **侧边栏位置**：发布管理 → 发布
+
+![批量发布](screenshots/08-publish.png)
+
+### 页面说明
+
+发布向导 —— 选择设备、分配视频、编辑文案标签，然后一键发布到多个账号。
+
+### 四步向导
+
+#### 第 1 步：选择设备
+
+- 从下拉菜单选择服务器
+- 设备以卡片形式展示，每张卡片显示名称、分组标签、平台标签
+- **勾选**要发布的设备
+- 可以点击「全选当前分组」快速选中一组设备
+- 使用筛选下拉菜单按分组或平台筛选
+
+#### 第 2 步：分配视频
+
+- 为每个选中的设备分配一个视频
+- 可以所有设备使用同一视频，也可以每个设备不同视频
+
+#### 第 3 步：编辑内容
+
+- 编辑每个设备的标题文案、标签、描述
+- 可以点击「从URL采集」加载之前采集的内容
+- 每个设备可以有独立的文案
+
+#### 第 4 步：确认发布
+
+- 检查所有分配情况
+- 点击「发布」开始执行
+
+### 顶部工具栏
+
+- **保存草稿**：保存当前的设置，下次可以恢复
+- **恢复草稿**：加载上次保存的草稿
+- **重置**：清空所有选择，重新开始
+
+### 注意事项
+
+- 发布会通过 AdsPower **打开真实浏览器窗口**进行自动化操作，所以 AdsPower 必须运行
+- 每个设备的发布任务大约需要 1-3 分钟
+- 发布过程中**不要手动操作 AdsPower 浏览器窗口**
+- 发布失败的任务可以从控制台或数据分析页面重试
+- 右上角必须显示「已连接」才能实时看到发布状态更新
+
+---
+
+## 14. 第八步：智能排期
+
+> **侧边栏位置**：发布管理 → 智能排期
+
+![智能排期](screenshots/09-schedule.png)
+
+### 页面说明
+
+管理定时发布任务。支持日历视图和推荐发布时段。
+
+### 页面元素
+
+**推荐发布时段**（TikTok 最佳发布时段）：
+- 早间 7:00-9:00
+- 午间 12:00-14:00
+- 晚间 18:00-21:00
+
+**统计卡片**：排队中、今日发布、失败（可重试）
+
+**排期日历**：
+- 月份/年份导航
+- 今天用蓝色高亮
+- 有任务的日期会显示指示器
+- 点击某天可查看当天任务
+
+### 创建排期任务
+
+1. 点击 **「新建排期」** 或 **「创建排期」**
+2. 选择设备、视频和内容
+3. 设置计划发布的日期和时间
+4. 保存后任务会在指定时间自动执行
+
+### 注意事项
+
+- 排期任务需要**后端服务持续运行**。如果关闭后端，到达时间的任务不会执行
+- AdsPower 也必须在排期时间时保持运行
+- 默认时区为 `America/Mexico_City`，可以在 `.env` 中通过 `DEFAULT_TIMEZONE` 修改
+- 使用任务标签筛选：全部、排队中、已发布、失败
+
+---
+
+## 15. 第九步：自动流水线
+
+> **侧边栏位置**：发布管理 → 自动流水线
+
+![自动流水线](screenshots/10-pipeline.png)
+
+### 页面说明
+
+最强大的功能 —— 一键完成从内容生成到视频制作到发布的全自动流程。
+
+### 流水线表格
+
+| 列 | 说明 |
+|----|------|
+| **ID** | 流水线运行编号 |
+| **状态** | 已完成（绿色）、失败（红色）、运行中 |
+| **进度** | 可视化进度条 |
+| **视频来源** | Kie.ai 生成 / ai_generate / upload |
+| **风格** | 使用的内容风格 |
+| **创建时间** | 流水线开始时间 |
+| **操作** | 重试（▶）/ 删除（🗑） |
+
+### 创建流水线
+
+1. 点击 **「新建流水线」**
+2. 在弹出的向导中：
+   - 选择一个商品
+   - 选择视频来源：**Kie.ai**（AI 生成视频）/ **MoviePy**（图片幻灯片）/ **上传**（使用现有视频）
+   - 选择目标设备
+   - 可选：设置定时执行
+3. 确认启动
+
+### 流水线阶段
+
+**Kie.ai 流程**（AI 视频生成）：
+```
+文案生成 → 脚本生成 → AI 视频生成 → 字幕生成 → 视频处理 → 发布
+```
+
+**MoviePy 流程**（图片视频）：
+```
+文案生成 → 脚本生成 → 图片生成 → 语音合成 → 视频组装 → 字幕生成 → 视频处理 → 发布
+```
+
+**上传流程**（使用现有视频）：
+```
+文案生成 → 字幕生成 → 视频处理 → 发布
+```
+
+### 注意事项
+
+- **AI 视频生成需要 `KIE_API_KEY`**，没有配置会在视频生成阶段失败
+- 视频生成需要 2-5 分钟，系统每 10 秒检查一次状态
+- 失败的流水线可以从失败的阶段**恢复**，不需要从头开始
+- 流水线在后台运行，可以同时浏览其他页面
+- 生成的视频会自动出现在视频库中
+
+---
+
+## 16. 第十步：模板库
+
+> **侧边栏位置**：发布管理 → 模板库
+
+![模板库](screenshots/11-templates.png)
+
+### 页面说明
+
+保存常用的发布配置为模板，下次发布时可以快速加载。
+
+### 使用方法
+
+1. 点击 **「新建模板」**
+2. 设置模板名称、默认文案、标签、内容风格等
+3. 保存模板
+4. 在发布或流水线中加载模板，快速填充配置
+
+### 注意事项
+
+- 模板保存的是**配置信息**（风格、文案、标签），不包含具体的视频或设备
+- 适合重复性发布任务：每天发布同类内容时，用模板可以节省大量时间
+
+---
+
+## 17. 第十一步：数据分析
+
+> **侧边栏位置**：数据监控 → 数据分析
+
+![数据分析](screenshots/12-analytics.png)
+
+### 页面说明
+
+可视化展示发布效果，包括趋势图表和成功率统计。
+
+### 页面元素
+
+| 元素 | 说明 |
+|------|------|
+| **日期范围选择器** | 选择要分析的时间段。预设：最近7天、最近30天 |
+| **发布趋势折线图** | 每天的成功/失败发布数量趋势 |
+| **成功/失败占比饼图** | 成功和失败的比例 |
+| **发布成功** | 选定期间成功发布的总数（绿色） |
+| **发布失败** | 失败发布的总数（红色） |
+| **成功率** | 成功发布占比百分比 |
+
+### 空数据状态
+
+当选定日期范围内没有数据时，页面会显示不同的提示：
+- 如果有任务正在执行：「X 个任务排队中，Y 个任务执行中。完成后数据自动显示」
+- 如果有历史数据但不在当前范围：「请尝试选择更大的日期范围」
+- 如果完全没有任务：显示「去发布」和「自动流水线」按钮
+
+### 注意事项
+
+- 只统计**已完成**的发布任务（状态为「已发布」或「失败」）
+- 排队中或执行中的任务不计入图表
+- 成功率颜色：绿色（≥80%），红色（<80%）
+- 如果 7 天视图为空，试试「最近30天」预设
+
+---
+
+## 18. 第十二步：账号健康
+
+> **侧边栏位置**：数据监控 → 账号健康
+
+![账号健康](screenshots/13-account-health.png)
+
+### 页面说明
+
+监控每个设备/账号的发布成功率和健康状况，及时发现需要处理的问题账号。
+
+### 统计卡片
+
+| 卡片 | 说明 |
+|------|------|
+| **设备总数** | 已同步的设备数量 |
+| **平均健康分数** | 所有设备的平均分（0-100）|
+| **有警告的设备** | 需要关注的设备数量 |
+
+### 健康表格
+
+| 列 | 说明 |
+|----|------|
+| **设备名称** | AdsPower 中的环境名称 |
+| **分组** | 设备所属分组（支持筛选） |
+| **发布总数** | 该设备的历史发布次数 |
+| **成功率** | 发布成功的百分比 |
+| **最后发布** | 最后一次发布时间，或「从未发布」 |
+| **健康分数** | 可视化进度条（0-100） |
+| **警告** | 绿色「正常」或红色警告标签 |
+
+### 健康分数含义
+
+- **70-100**：健康（绿色）
+- **40-69**：一般（蓝色）
+- **0-39**：异常（红色）—— 需要检查
+
+### 导出功能
+
+点击右上角 **「导出 CSV」** 可以将健康数据下载为 Excel 可以打开的表格文件。
+
+### 注意事项
+
+- 健康数据每 60 秒自动刷新
+- 分数低于 40 的设备建议检查是否有账号问题
+- 「从未发布过」的设备不一定不健康，可能只是还没使用过
+- 分组筛选下拉菜单会根据实际数据动态生成
+
+---
+
+## 19. 完整操作演示（从零开始）
+
+> 以下演示假设你已经完成了环境搭建、API 密钥配置，并成功启动了程序。
+
+### 演示场景
+
+我们将完成一个完整的工作流程：**抓取一个 TikTok 商品 → AI 评分 → 生成文案 → 发布到两个账号**。
+
+### 第 1 步：添加 AdsPower 服务器
+
+1. 打开 AdsPower 客户端，确认已登录
+2. 进入 API & MCP 页面，复制 API 地址（例如 `http://127.0.0.1:50325`）
+3. 在平台中进入 **服务器** 页面
+4. 点击「添加服务器」
+5. 填写：
+   - 名称：`我的AdsPower`
+   - 服务器地址：`http://127.0.0.1:50325`
+6. 点击确定
+
+### 第 2 步：同步设备
+
+1. 点击「下一步：同步设备」，或在侧边栏点击「设备」
+2. 确认服务器下拉选中了刚才添加的服务器
+3. 点击「同步设备」
+4. 等待同步完成，确认设备列表中出现了你的浏览器环境
+
+### 第 3 步：抓取商品
+
+1. 进入 **商品** 页面
+2. 在顶部输入一个 TikTok Shop 商品链接：
+   ```
+   https://shop.tiktok.com/us/pdp/neuro-energy-caffeine-gum-nootropic-brain-supplement...
+   ```
+3. 点击「抓取」
+4. 等待几秒，商品信息自动填入表格
+
+### 第 4 步：AI 商品评分
+
+1. 在商品表格中找到刚抓取的商品
+2. 点击右侧的「评分」按钮
+3. 等待 AI 分析（约 5-10 秒）
+4. 查看评分结果：
+   - 分数（如 78 分 — 黄色）
+   - 评分理由
+   - 推荐营销角度
+
+### 第 5 步：AI 文案生成
+
+1. 进入 **文案生成** 页面
+2. **步骤 1**：在下拉菜单中选择刚才抓取的商品
+3. **步骤 2**：
+   - 内容风格选择「产品测评」
+   - 视频模型选择「Veo 3 Fast」
+   - 视频时长选择「8 秒」
+4. 点击 **「一键生成（文案 + 脚本）」**
+5. 等待生成完成（约 10-15 秒）
+6. 查看生成结果：
+   - 标题文案（例如：「This energy gum changed my morning routine...」）
+   - 标签（如 #energygum #nootropic #brainfuel 等）
+   - 视频脚本（Hook → Body → CTA 结构）
+
+### 第 6 步：上传视频
+
+1. 进入 **视频** 页面
+2. 将准备好的 MP4 视频文件拖放到上传区域
+3. 等待上传完成，确认视频卡片出现
+
+### 第 7 步：发布到多个账号
+
+1. 进入 **发布** 页面
+2. **选择设备**：勾选要发布的 2 个设备（如 test1 和 test2）
+3. 点击「下一步」
+4. **分配视频**：为每个设备选择视频
+5. 点击「下一步」
+6. **编辑内容**：文案和标签会自动使用之前生成的内容，也可以手动修改
+7. 点击「下一步」
+8. **确认发布**：检查所有信息无误
+9. 点击「发布」
+
+### 第 8 步：查看发布结果
+
+1. 回到 **控制台**，在「最近任务」表格中查看发布状态
+2. 「已发布」（绿色标签）= 发布成功
+3. 「失败」（红色标签）= 发布失败，可以重试
+4. 进入 **数据分析** 查看趋势图和成功率
+5. 进入 **账号健康** 查看各设备的健康分数
+
+### 使用自动流水线（全自动方式）
+
+如果你想跳过手动步骤，可以使用**自动流水线**一键完成全部流程：
+
+1. 进入 **自动流水线** 页面
+2. 点击「新建流水线」
+3. 选择商品（上面抓取的商品）
+4. 选择视频来源：「Kie.ai」（AI 自动生成视频）
+5. 选择内容风格：「产品测评」
+6. 选择目标设备：勾选 test1 和 test2
+7. 点击确认启动
+8. 流水线会自动执行所有阶段：
+   - 文案生成 ✅
+   - 脚本生成 ✅
+   - AI 视频生成 ⏳（需要 2-5 分钟）
+   - 字幕生成 ✅
+   - 视频处理 ✅
+   - 发布 ✅
+
+---
+
+## 20. 常见问题与解决方案
+
+### 启动相关
+
+| 问题 | 原因 | 解决方案 |
+|------|------|----------|
+| 终端提示 `command not found: python3` | Python 未安装或未添加到 PATH | 重新安装 Python，确保勾选「Add to PATH」 |
+| 终端提示 `command not found: npm` | Node.js 未安装 | 重新安装 Node.js |
+| `pip install` 失败 | 虚拟环境未激活 | 先执行 `source venv/bin/activate`（Mac）或 `venv\Scripts\activate`（Windows） |
+| 后端启动报错 `No module named 'app'` | 没有在 backend 目录下运行 | 确保 `cd backend` 后再启动 |
+| 前端启动报错 | 依赖未安装 | 在 frontend 目录下执行 `npm install` |
+| 数据库报错 | 数据库未初始化 | 执行 `alembic upgrade head` |
+
+### 连接相关
+
+| 问题 | 原因 | 解决方案 |
+|------|------|----------|
+| 右上角显示「未连接」 | 后端 WebSocket 断开 | 检查后端终端是否有报错，重启后端服务 |
+| 同步设备返回空列表 | AdsPower 未运行 | 打开 AdsPower 并登录 |
+| 「Too many requests」错误 | AdsPower API 限流 | 等待 5 秒后重试 |
+| 测试连接失败 | 服务器地址错误或 AdsPower 未运行 | 检查 API 地址是否正确，AdsPower 是否正在运行 |
+
+### AI 功能相关
+
+| 问题 | 原因 | 解决方案 |
+|------|------|----------|
+| 文案生成失败 | `ANTHROPIC_API_KEY` 未配置 | 在 `backend/.env` 中填入有效的 Anthropic API 密钥 |
+| 商品评分失败 | 同上 | 同上 |
+| 流水线在「AI 视频生成」阶段失败 | `KIE_API_KEY` 未配置 | 在 `.env` 中填入有效的 kie.ai API 密钥 |
+| 视频生成超时 | kie.ai 服务繁忙 | 重试流水线（点击 ▶ 按钮） |
+
+### 发布相关
+
+| 问题 | 原因 | 解决方案 |
+|------|------|----------|
+| 发布任务卡住不动 | AdsPower 浏览器问题 | 检查 AdsPower 中对应的环境是否可以正常打开 |
+| 发布失败 | 目标平台限制或账号问题 | 查看失败任务的错误信息，检查账号状态 |
+| 数据分析页面空白 | 选定日期范围内没有已完成的任务 | 扩大日期范围，使用「最近30天」预设 |
+
+### 环境变量完整参考
+
+在 `backend/.env` 文件中可以配置的所有变量：
+
+```env
+# ===== 必填项 =====
+
+# Anthropic API 密钥（AI 文案生成、商品评分）
+ANTHROPIC_API_KEY=sk-ant-api03-xxxxxxxx
+
+# ===== 按需填写 =====
+
+# kie.ai API 密钥（AI 视频生成，仅自动流水线需要）
+KIE_API_KEY=kie_xxxxxxxx
+
+# OpenAI API 密钥（图片生成，可选）
+OPENAI_API_KEY=sk-xxxxxxxx
+
+# ===== 一般不需要修改 =====
+
+# 数据库路径
+DATABASE_URL=sqlite+aiosqlite:///./data/app.db
+
+# AdsPower 默认地址
+ADSPOWER_BASE_URL=http://127.0.0.1:50325
+
+# 采集使用的 Profile ID
+SCRAPER_PROFILE_ID=你的ProfileID
+
+# 默认时区
+DEFAULT_TIMEZONE=America/Mexico_City
+
+# AI 模型选择
+ANTHROPIC_MODEL=claude-sonnet-4-6
+
+# 内容生成语言
+CONTENT_PRIMARY_LANGUAGE=en
+```
+
+---
+
+> **需要帮助？** 如果遇到本指南中未涉及的问题，请在 GitHub Issues 中提交。
