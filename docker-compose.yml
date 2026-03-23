@@ -15,8 +15,16 @@ services:
       - UPLOAD_DIR=./data/uploads
       - HOST=0.0.0.0
       - PORT=8000
+      # Docker containers cannot reach host via 127.0.0.1
+      # This override ensures AdsPower is reachable regardless of .env setting
       - ADSPOWER_BASE_URL=http://host.docker.internal:50325
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     # AdsPower runs on the host machine, so the container needs host network access
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -27,5 +35,12 @@ services:
     ports:
       - "5173:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_started
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

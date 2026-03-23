@@ -38,7 +38,10 @@ COPY . .
 # Create data directories
 RUN mkdir -p data/uploads data/assets output/videos
 
-# Run database migrations on startup, then start the server
-CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+# Make entrypoint executable
+RUN chmod +x entrypoint.sh
 
 EXPOSE 8000
+
+# Use entrypoint script for clean startup logging
+ENTRYPOINT ["./entrypoint.sh"]

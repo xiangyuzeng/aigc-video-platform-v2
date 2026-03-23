@@ -11,76 +11,58 @@
    - Windows：https://docs.docker.com/desktop/install/windows-install/
    - Linux：https://docs.docker.com/desktop/install/linux/
 
-2. 安装 **AdsPower** 并登录
+2. 安装并登录 **AdsPower**
 
 ---
 
-## 快速启动
+## 快速启动（推荐）
 
-### 第 1 步：下载代码
+### 使用启动脚本
 
 ```bash
-git clone https://github.com/xiangyuzeng/aigc-video-platform-v2.git
-cd aigc-video-platform-v2
+# Mac / Linux
+./start.sh
+
+# Windows — 双击 start.bat
 ```
 
-### 第 2 步：配置环境变量
+脚本会自动：检查 Docker → 检查 .env → 构建镜像 → 启动容器。
+
+### 手动启动
 
 ```bash
+# 第 1 步：配置环境变量
 cp backend/.env.example backend/.env
+# 编辑 backend/.env 填入 ANTHROPIC_API_KEY 和 KIE_API_KEY
+
+# 第 2 步：启动
+docker compose up --build -d
+
+# 第 3 步：访问
+# 浏览器打开 http://localhost:5173
 ```
 
-编辑 `backend/.env`，填入你的密钥：
+---
 
-```env
-# 必填：AI 文案生成
-ANTHROPIC_API_KEY=sk-ant-api03-你的密钥
+## 完整文档
 
-# 必填（流水线功能）：AI 视频生成
-KIE_API_KEY=你的kie密钥
+详细的安装指南、API 密钥获取、功能说明和故障排除请参见：
 
-# 重要：Docker 环境下需要改为 host.docker.internal
-ADSPOWER_BASE_URL=http://host.docker.internal:50325
-```
-
-> **注意**：Docker 容器无法通过 `127.0.0.1` 访问宿主机上的 AdsPower。必须使用 `host.docker.internal`。
-
-### 第 3 步：启动
-
-```bash
-docker compose up --build
-```
-
-首次启动会自动：
-- 安装所有 Python/Node.js 依赖
-- 安装 Playwright 浏览器驱动
-- 构建前端生产版本
-- 运行数据库迁移
-- 启动后端和前端服务
-
-等待看到类似输出：
-```
-aigc-backend   | INFO:     Uvicorn running on http://0.0.0.0:8000
-aigc-frontend  | ... nginx ...
-```
-
-### 第 4 步：访问平台
-
-打开浏览器访问：**http://localhost:5173**
+**[完整使用指南（Wiki）](docs/wiki/WIKI.md)**
 
 ---
 
 ## 常用命令
 
 ```bash
-# 启动（后台运行）
+# 后台启动
 docker compose up -d
 
 # 查看日志
 docker compose logs -f
 
-# 只看后端日志
-docker compose logs -f backend
+# 查看容器状态
+docker compose ps
 
 # 停止
 docker compose down
@@ -88,8 +70,8 @@ docker compose down
 # 重新构建（代码更新后）
 docker compose up --build -d
 
-# 清理所有数据重新开始
-docker compose down -v
+# 完全重置
+docker compose down
 rm -rf backend/data/*
 docker compose up --build
 ```
@@ -98,8 +80,6 @@ docker compose up --build
 
 ## 数据持久化
 
-以下目录挂载到宿主机，容器删除后数据不会丢失：
-
 | 容器路径 | 宿主机路径 | 内容 |
 |---------|-----------|------|
 | `/app/data` | `./backend/data` | SQLite 数据库 + 上传的视频 |
@@ -107,23 +87,16 @@ docker compose up --build
 
 ---
 
-## Docker 与 AdsPower 的网络连接
+## 跨平台兼容性
 
-AdsPower 运行在你的电脑（宿主机）上，Docker 容器需要通过特殊地址访问：
+| 系统 | Docker | AdsPower 地址 | 启动命令 |
+|------|--------|--------------|---------|
+| **Mac (Apple Silicon)** | Docker Desktop | `host.docker.internal:50325` | `./start.sh` |
+| **Mac (Intel)** | Docker Desktop | `host.docker.internal:50325` | `./start.sh` |
+| **Windows 10/11** | Docker Desktop + WSL 2 | `host.docker.internal:50325` | 双击 `start.bat` |
+| **Linux (Ubuntu/Debian)** | Docker Engine | `172.17.0.1:50325` | `./start.sh` |
 
-| 系统 | AdsPower 地址（.env 中填写） |
-|------|---------------------------|
-| Mac / Windows | `http://host.docker.internal:50325` |
-| Linux | `http://172.17.0.1:50325`（或使用 `--network host`） |
-
-如果使用 Linux 且上述地址不通，可以改用 host 网络模式：
-
-```yaml
-# docker-compose.yml 中添加
-services:
-  backend:
-    network_mode: host
-```
+> Docker Desktop 版本要求：4.0+（支持 `docker compose` V2 命令）
 
 ---
 
@@ -132,7 +105,7 @@ services:
 | 问题 | 解决方案 |
 |------|----------|
 | `Cannot connect to the Docker daemon` | 确认 Docker Desktop 已启动 |
-| 前端显示「未连接」 | 检查后端日志：`docker compose logs backend` |
-| 无法连接 AdsPower | 确认 `.env` 中使用了 `host.docker.internal`（非 `127.0.0.1`）|
-| 构建失败 | 确保网络通畅（需要下载依赖），重试：`docker compose build --no-cache` |
-| 视频上传失败 | 检查 `backend/data/uploads` 目录权限 |
+| 前端显示「未连接」 | `docker compose logs backend` 查看报错 |
+| 无法连接 AdsPower | 服务器页面地址填 `http://host.docker.internal:50325` |
+| 构建失败 | `docker compose build --no-cache` 重试 |
+| 存储损坏 (input/output error) | 重置 Docker：Mac 删除 `~/Library/Containers/com.docker.docker/Data/vms`，Windows 在 Docker Desktop → Troubleshoot → Clean/Purge data |

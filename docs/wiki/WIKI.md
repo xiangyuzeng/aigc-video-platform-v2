@@ -58,99 +58,163 @@
 
 **Mac：**
 1. 访问 https://docs.docker.com/desktop/install/mac-install/
-2. 根据你的芯片选择下载（Apple 芯片 / Intel 芯片）
+2. 根据你的芯片选择下载：
+   - **Apple 芯片**（M1/M2/M3/M4）：选 "Apple Silicon"
+   - **Intel 芯片**：选 "Intel Chip"
+   - 不确定？点击左上角  → 关于本机 → 查看"芯片"
 3. 打开下载的 `.dmg` 文件，将 Docker 拖入 Applications 文件夹
 4. 从 Applications 中打开 Docker
-5. 首次启动需要等待 Docker 引擎初始化（状态栏鲸鱼图标变为稳定状态）
+5. 首次启动需要授权密码，然后等待 Docker 引擎初始化
+6. **状态栏鲸鱼图标停止动画** = 启动完成
 
 **Windows：**
 1. 访问 https://docs.docker.com/desktop/install/windows-install/
 2. 下载并运行安装程序
-3. 安装过程中会提示启用 WSL 2（按提示操作即可）
-4. 安装完成后重启电脑
-5. 打开 Docker Desktop，等待引擎启动
+3. 安装过程中会提示启用 **WSL 2**（Windows Subsystem for Linux）
+   - 勾选 "Use WSL 2 instead of Hyper-V"（推荐）
+   - 如果提示需要更新 WSL，按照弹窗链接安装 WSL 2 更新包
+4. 安装完成后**重启电脑**
+5. 重启后打开 Docker Desktop，等待引擎启动
+6. **系统托盘鲸鱼图标变绿** = 启动完成
 
-**验证安装**（打开终端/命令提示符）：
+**Linux（Ubuntu/Debian）：**
+```bash
+# 安装 Docker Engine
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker $USER
+# 注销后重新登录使生效
+```
+
+**验证安装**（打开终端 / PowerShell / 命令提示符）：
 ```bash
 docker --version
 docker compose version
 ```
-都有输出即表示安装成功。
+两条命令都有输出即表示安装成功。如果提示 "command not found"，请重启终端再试。
 
 ### 2.2 安装 AdsPower
 
 1. 访问 [AdsPower 官网](https://www.adspower.com/) 下载对应系统版本
 2. 安装并打开 AdsPower
-3. **注册或登录** AdsPower 账号（必须登录才能使用 API）
+3. **注册或登录** AdsPower 账号（**必须登录才能使用 API**）
 4. 在 AdsPower 中创建至少一个浏览器环境（Profile）
+5. 确认 API 已启用：点击顶部 **API & MCP** → 看到 API 地址（如 `http://127.0.0.1:50325`）
 
-### 2.3 安装 Git 并下载代码
+> **重要**：AdsPower 必须保持打开和登录状态，平台才能控制浏览器环境。
 
-**Mac（如果没有 Git）：**
+### 2.3 下载代码
+
+**方式一：使用 Git（推荐）**
+
+先安装 Git（如果没有）：
+- Mac：打开终端运行 `xcode-select --install`
+- Windows：访问 https://git-scm.com/download/win 下载安装
+
+然后下载代码：
 ```bash
-xcode-select --install
-```
-
-**Windows（如果没有 Git）：**
-访问 https://git-scm.com/download/win 下载安装。
-
-**下载项目代码：**
-```bash
+# Mac / Linux
 cd ~/Desktop
 git clone https://github.com/xiangyuzeng/aigc-video-platform-v2.git
 cd aigc-video-platform-v2
+
+# Windows (PowerShell)
+cd $env:USERPROFILE\Desktop
+git clone https://github.com/xiangyuzeng/aigc-video-platform-v2.git
+cd aigc-video-platform-v2
+```
+
+**方式二：直接下载 ZIP（不需要 Git）**
+
+1. 访问 https://github.com/xiangyuzeng/aigc-video-platform-v2/archive/refs/heads/main.zip
+2. 解压到桌面
+3. 打开终端，进入解压后的文件夹：
+```bash
+# Mac
+cd ~/Desktop/aigc-video-platform-v2-main
+
+# Windows (PowerShell)
+cd $env:USERPROFILE\Desktop\aigc-video-platform-v2-main
 ```
 
 ### 2.4 配置环境变量
 
 ```bash
+# Mac / Linux
 cp backend/.env.example backend/.env
+
+# Windows (PowerShell)
+copy backend\.env.example backend\.env
 ```
 
-然后编辑 `backend/.env` 文件，填入你的 API 密钥（详见[第 4 节](#4-api-密钥配置)）：
+然后用文本编辑器打开 `backend/.env`，填入你的 API 密钥（详见[第 4 节](#4-api-密钥配置)）。
+
+**必须修改的 3 项：**
 
 ```env
-# 必填：AI 文案生成
+# 1. AI 文案生成密钥（必填，否则文案功能不可用）
 ANTHROPIC_API_KEY=sk-ant-api03-你的密钥
 
-# 流水线视频生成时需要
+# 2. AI 视频生成密钥（流水线功能需要，否则可跳过）
 KIE_API_KEY=你的kie密钥
 
-# ⚠️ Docker 环境必须使用 host.docker.internal（不是 127.0.0.1）
-ADSPOWER_BASE_URL=http://host.docker.internal:50325
+# 3. AdsPower 地址（Docker 会自动处理，通常无需手动改）
+#    docker-compose.yml 已自动覆盖为 host.docker.internal
+ADSPOWER_BASE_URL=http://127.0.0.1:50325
 ```
 
-> **关键区别**：Docker 容器无法通过 `127.0.0.1` 访问你电脑上运行的 AdsPower。必须将 `.env` 中的 `ADSPOWER_BASE_URL` 改为 `http://host.docker.internal:50325`。
+> **注意**：Docker 环境中 `ADSPOWER_BASE_URL` 会被 `docker-compose.yml` 自动覆盖为 `http://host.docker.internal:50325`，所以 `.env` 中保持默认值即可。
 
 ### 2.5 一键启动
+
+**方式一：使用启动脚本（最简单）**
+
+```bash
+# Mac / Linux
+./start.sh
+
+# Windows — 双击 start.bat 文件
+```
+
+启动脚本会自动：检查 Docker → 检查配置 → 构建镜像 → 启动容器。
+
+**方式二：手动启动**
 
 确保 **Docker Desktop** 和 **AdsPower** 都已经打开，然后运行：
 
 ```bash
-docker compose up --build
+docker compose up --build -d
 ```
 
-首次启动会：
-1. 自动下载 Python 和 Node.js 运行环境（约 2-5 分钟）
-2. 自动安装所有依赖库
-3. 自动安装 Playwright 浏览器驱动
-4. 自动构建前端生产版本
-5. 自动运行数据库迁移
-6. 启动后端和前端服务
+首次启动会自动完成以下步骤（约 3-5 分钟）：
+1. 下载 Python 3.11 + Node.js 18 运行环境
+2. 安装所有后端和前端依赖库
+3. 安装 Playwright 浏览器驱动（用于自动化发布）
+4. 构建前端生产版本
+5. 运行数据库迁移（创建表结构）
+6. 启动后端 API 服务器和前端 Web 服务器
+
+查看启动进度：
+```bash
+docker compose logs -f
+```
 
 看到以下输出表示启动成功：
 ```
+aigc-backend   | [2/2] Starting API server on port 8000...
 aigc-backend   | INFO:     Uvicorn running on http://0.0.0.0:8000
 aigc-frontend  | ... start worker processes ...
 ```
 
-> **提示**：首次构建较慢（2-5 分钟），之后再次启动只需几秒钟。
+> **提示**：首次构建较慢（3-5 分钟），之后再次启动只需几秒钟。
 
 ### 2.6 打开平台
 
 在浏览器中访问：**http://localhost:5173**
 
-你应该能看到平台的控制台页面。
+你应该能看到平台的控制台页面，右上角显示「已连接」。
+
+> **如果显示「未连接」**：运行 `docker compose logs backend` 查看后端是否有报错。
 
 ### 2.7 常用 Docker 命令
 
@@ -158,11 +222,14 @@ aigc-frontend  | ... start worker processes ...
 # 后台启动（不占用终端窗口）
 docker compose up -d
 
-# 查看运行日志
+# 查看运行日志（按 Ctrl+C 退出查看）
 docker compose logs -f
 
 # 只看后端日志
 docker compose logs -f backend
+
+# 查看容器健康状态
+docker compose ps
 
 # 停止平台
 docker compose down
@@ -170,9 +237,10 @@ docker compose down
 # 代码更新后重新构建
 docker compose up --build -d
 
-# 完全重置（清除所有数据）
+# 完全重置（清除所有数据，从零开始）
 docker compose down
-rm -rf backend/data/*
+rm -rf backend/data/*         # Mac / Linux
+# rmdir /s backend\data       # Windows
 docker compose up --build
 ```
 
@@ -180,23 +248,25 @@ docker compose up --build
 
 以下数据保存在你的电脑上，即使删除容器也不会丢失：
 
-| 数据 | 本地路径 |
-|------|----------|
-| 数据库（所有配置和任务记录） | `backend/data/app.db` |
-| 上传的视频文件 | `backend/data/uploads/` |
-| 生成的视频文件 | `backend/output/` |
+| 数据 | 本地路径 | 说明 |
+|------|----------|------|
+| 数据库 | `backend/data/app.db` | 所有配置、任务记录、商品信息 |
+| 上传的视频 | `backend/data/uploads/` | 手动上传的 MP4 文件 |
+| 生成的视频 | `backend/output/` | AI 流水线生成的视频文件 |
+
+> **备份**：只需复制 `backend/data/` 和 `backend/output/` 文件夹即可完整备份所有数据。
 
 ### 2.9 Docker 与 AdsPower 的网络连接
 
-AdsPower 运行在你的电脑上（不在 Docker 中），所以需要使用特殊地址：
+AdsPower 运行在你的电脑上（不在 Docker 中），所以 Docker 容器需要通过特殊地址访问宿主机：
 
-| 你的系统 | `.env` 中填写的 AdsPower 地址 |
-|----------|---------------------------|
-| Mac | `http://host.docker.internal:50325` |
-| Windows | `http://host.docker.internal:50325` |
-| Linux | `http://172.17.0.1:50325` |
+| 你的系统 | 平台「服务器」页面中填写的 AdsPower 地址 |
+|----------|----------------------------------------|
+| **Mac** | `http://host.docker.internal:50325` |
+| **Windows** | `http://host.docker.internal:50325` |
+| **Linux** | `http://172.17.0.1:50325`（或使用 `--network host`） |
 
-同样，在平台的「服务器」页面添加 AdsPower 时，也要填写上述地址（而不是 `127.0.0.1`）。
+> **重要**：`docker-compose.yml` 已自动将后端的 AdsPower 地址设为 `host.docker.internal`。你只需要在平台「服务器」页面添加 AdsPower 时，也使用上述地址（而不是 `127.0.0.1`）。
 
 ---
 
@@ -839,25 +909,30 @@ DEFAULT_TIMEZONE=America/Mexico_City
 
 | 问题 | 解决方案 |
 |------|----------|
-| `Cannot connect to the Docker daemon` | 打开 Docker Desktop 并等待引擎启动 |
-| 首次构建很慢 | 正常，需下载依赖（2-5 分钟），后续启动几秒 |
+| `Cannot connect to the Docker daemon` | 打开 Docker Desktop 并等待引擎启动（鲸鱼图标停止动画） |
+| 首次构建很慢 | 正常，需下载依赖（3-5 分钟），后续启动几秒 |
 | 容器启动后前端显示「未连接」 | 运行 `docker compose logs backend` 查看后端报错 |
-| 无法连接 AdsPower | `.env` 中 `ADSPOWER_BASE_URL` 必须是 `http://host.docker.internal:50325` |
-| 平台「服务器」页面连接失败 | 服务器地址也要填 `http://host.docker.internal:50325` |
+| 无法连接 AdsPower | 服务器页面中的地址必须是 `http://host.docker.internal:50325`（不是 127.0.0.1） |
 | 需要重置所有数据 | `docker compose down && rm -rf backend/data/* && docker compose up --build` |
 | 更新代码后不生效 | `git pull && docker compose up --build -d` |
-| 构建失败 `input/output error` | Docker 存储损坏。退出 Docker Desktop → 删除 `~/Library/Containers/com.docker.docker/Data` → 重新打开 Docker Desktop → 重新构建 |
-| Builders 页面显示 Error | 同上，属于 Docker 存储损坏，需要清除数据目录后重启 |
+| 构建失败 `input/output error` | Docker 存储损坏。Mac: 退出 Docker → 删除 `~/Library/Containers/com.docker.docker/Data/vms` → 重开。Windows: Docker Desktop → Settings → Troubleshoot → Clean/Purge data |
+| Builders 页面显示 Error | 同上，属于 Docker 存储损坏 |
+| Windows: `docker compose` 无响应 | 以管理员身份运行 PowerShell |
+| Windows: WSL 2 相关错误 | 运行 `wsl --update` 更新 WSL 内核 |
+| Mac: 端口 5173 被占用 | `lsof -i :5173` 查看占用进程，`kill <PID>` 结束 |
+| Windows: 端口 5173 被占用 | `netstat -ano \| findstr :5173` 查看 PID，`taskkill /PID <PID> /F` 结束 |
+| Linux: permission denied | 确认用户在 docker 组：`sudo usermod -aG docker $USER`，然后注销重登 |
 
 ### 手动安装相关
 
 | 问题 | 解决方案 |
 |------|----------|
-| `command not found: python3` | 重新安装 Python，勾选 Add to PATH |
+| `command not found: python3` | 重新安装 Python，**勾选 Add to PATH** |
 | `command not found: npm` | 重新安装 Node.js |
-| `pip install` 失败 | 先激活虚拟环境：`source venv/bin/activate` |
+| `pip install` 失败 | 先激活虚拟环境：Mac `source venv/bin/activate` / Windows `venv\Scripts\activate` |
 | `No module named 'app'` | 确保在 `backend` 目录下运行 |
 | 数据库报错 | 运行 `alembic upgrade head` |
+| Windows: `playwright install` 失败 | 以管理员身份运行 PowerShell |
 
 ### 连接相关
 
