@@ -15,6 +15,7 @@ services:
       - UPLOAD_DIR=./data/uploads
       - HOST=0.0.0.0
       - PORT=8000
+      - ADSPOWER_BASE_URL=http://host.docker.internal:50325
     restart: unless-stopped
     # AdsPower runs on the host machine, so the container needs host network access
     extra_hosts:
