@@ -31,3 +31,9 @@ Thumbs.db
 
 # Output
 output/
+
+# Backups (contains credentials)
+backup/
+
+# Docker
+backend/venv/

@@ -1,0 +1,30 @@
+services:
+  backend:
+    build: ./backend
+    container_name: aigc-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persist database and uploads across container restarts
+      - ./backend/data:/app/data
+      - ./backend/output:/app/output
+    env_file:
+      - ./backend/.env
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///./data/app.db
+      - UPLOAD_DIR=./data/uploads
+      - HOST=0.0.0.0
+      - PORT=8000
+    restart: unless-stopped
+    # AdsPower runs on the host machine, so the container needs host network access
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  frontend:
+    build: ./frontend
+    container_name: aigc-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
