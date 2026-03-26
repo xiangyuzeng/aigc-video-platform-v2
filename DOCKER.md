@@ -46,9 +46,8 @@ docker compose up --build -d
 
 ## 完整文档
 
-详细的安装指南、API 密钥获取、功能说明和故障排除请参见：
-
-**[完整使用指南（Wiki）](docs/wiki/WIKI.md)**
+- **[项目首页（README）](README.md)** — 功能介绍、快速启动、环境变量说明
+- **[完整使用指南（Wiki）](docs/wiki/WIKI.md)** — 详细安装指南、API 密钥获取、功能说明和故障排除
 
 ---
 

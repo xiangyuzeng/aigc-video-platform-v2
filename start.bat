@@ -1,20 +1,20 @@
 @echo off
 REM ============================================================
-REM  AIGC Video Platform — Quick Start (Windows)
+REM  AIGC 视频发布平台 — 一键启动 (Windows)
 REM ============================================================
 chcp 65001 >nul 2>&1
 
 echo.
 echo ================================================
-echo   AIGC Video Platform - Quick Start
+echo   AIGC 视频发布平台 - 一键启动
 echo ================================================
 echo.
 
-REM --- Check Docker ---
+REM --- 检查 Docker ---
 where docker >nul 2>&1
 if errorlevel 1 (
-    echo [ERROR] Docker is not installed.
-    echo   Please install Docker Desktop:
+    echo [错误] 未检测到 Docker。
+    echo   请先安装 Docker Desktop：
     echo   https://docs.docker.com/desktop/install/windows-install/
     pause
     exit /b 1
@@ -22,58 +22,58 @@ if errorlevel 1 (
 
 docker info >nul 2>&1
 if errorlevel 1 (
-    echo [WARN] Docker is not running. Please start Docker Desktop.
-    echo   Waiting 30 seconds...
+    echo [提示] Docker 未运行，正在尝试启动 Docker Desktop...
+    echo   等待 30 秒...
     start "" "C:\Program Files\Docker\Docker\Docker Desktop.exe" 2>nul
     timeout /t 30 /nobreak >nul
     docker info >nul 2>&1
     if errorlevel 1 (
-        echo [ERROR] Docker failed to start. Please open Docker Desktop manually.
+        echo [错误] Docker 启动失败，请手动打开 Docker Desktop 后重试。
         pause
         exit /b 1
     )
 )
-echo [OK] Docker is running
+echo [OK] Docker 已运行
 
-REM --- Check .env ---
+REM --- 检查 .env 配置 ---
 if not exist backend\.env (
-    echo [INFO] backend\.env not found, creating from template...
+    echo [提示] 未找到 backend\.env 配置文件，正在从模板创建...
     copy backend\.env.example backend\.env >nul
     echo.
-    echo   Please edit backend\.env and fill in your API keys:
-    echo     ANTHROPIC_API_KEY=sk-ant-api03-YOUR_KEY
-    echo     KIE_API_KEY=YOUR_KIE_KEY
+    echo   请在打开的记事本中填写 API 密钥：
+    echo     ANTHROPIC_API_KEY=你的 Anthropic 密钥
+    echo     KIE_API_KEY=你的 kie.ai 密钥
     echo.
-    echo   Then run this script again.
+    echo   保存后重新运行此脚本。
     notepad backend\.env
     pause
     exit /b 0
 )
-echo [OK] Environment config ready
+echo [OK] 配置文件已就绪
 
-REM --- Build and start ---
+REM --- 构建并启动 ---
 echo.
-echo Starting platform (first time takes 3-5 minutes)...
+echo 正在启动平台（首次构建约需 3-5 分钟）...
 echo.
 docker compose up --build -d
 
 if errorlevel 1 (
     echo.
-    echo [ERROR] Failed to start. Check Docker Desktop is running.
+    echo [错误] 启动失败，请检查 Docker Desktop 是否正常运行。
     pause
     exit /b 1
 )
 
 echo.
 echo ================================================
-echo   Platform started successfully!
+echo   平台启动成功！
 echo ================================================
 echo.
-echo   Open in browser: http://localhost:5173
+echo   浏览器打开: http://localhost:5173
 echo.
-echo   Commands:
-echo     View logs:    docker compose logs -f
-echo     Stop:         docker compose down
-echo     Rebuild:      docker compose up --build -d
+echo   常用命令:
+echo     查看日志:    docker compose logs -f
+echo     停止:        docker compose down
+echo     重新构建:    docker compose up --build -d
 echo.
 pause
